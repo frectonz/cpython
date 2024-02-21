@@ -1,4 +1,4 @@
-# Frectonz's Horrfic Python Monster
+# Frectonz's Horrific Python Monster
 
 ```
 doer main():
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     main()
 ```
 
-# How to run
+# How to run it
 
 ```
 nix develop
