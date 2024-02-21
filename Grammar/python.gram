@@ -111,10 +111,13 @@ simple_stmt[stmt_ty] (memo):
     | assignment
     | &"type" type_alias
     | e=star_expressions { _PyAST_Expr(e, EXTRA) }
-    | &'return' return_stmt
+    | &'bababooey' return_stmt
     | &('import' | 'from') import_stmt
     | &'raise' raise_stmt
     | 'pass' { _PyAST_Pass(EXTRA) }
+    | 'todo' { _PyAST_Pass(EXTRA) }
+    | 'unimplemented' { _PyAST_Pass(EXTRA) }
+    | '.' { _PyAST_Pass(EXTRA) }
     | &'del' del_stmt
     | &'yield' yield_stmt
     | &'assert' assert_stmt
@@ -125,7 +128,7 @@ simple_stmt[stmt_ty] (memo):
 
 compound_stmt[stmt_ty]:
     | invalid_compound_stmt
-    | &('def' | '@' | 'async') function_def
+    | &('doer' | '@' | 'async') function_def
     | &'if' if_stmt
     | &('class' | '@') class_def
     | &('with' | 'async') with_stmt
@@ -173,7 +176,7 @@ augassign[AugOperator*]:
     | '//=' { _PyPegen_augoperator(p, FloorDiv) }
 
 return_stmt[stmt_ty]:
-    | 'return' a=[star_expressions] { _PyAST_Return(a, EXTRA) }
+    | 'bababooey' a=[star_expressions] { _PyAST_Return(a, EXTRA) }
 
 raise_stmt[stmt_ty]:
     | 'raise' a=expression b=['from' z=expression { z }] { _PyAST_Raise(a, b, EXTRA) }
@@ -266,11 +269,11 @@ function_def[stmt_ty]:
 
 function_def_raw[stmt_ty]:
     | invalid_def_raw
-    | 'def' n=NAME t=[type_params] &&'(' params=[params] ')' a=['->' z=expression { z }] &&':' tc=[func_type_comment] b=block {
+    | 'doer' n=NAME t=[type_params] &&'(' params=[params] ')' a=['->' z=expression { z }] &&':' tc=[func_type_comment] b=block {
         _PyAST_FunctionDef(n->v.Name.id,
                         (params) ? params : CHECK(arguments_ty, _PyPegen_empty_arguments(p)),
                         b, NULL, a, NEW_TYPE_COMMENT(p, tc), t, EXTRA) }
-    | 'async' 'def' n=NAME t=[type_params] &&'(' params=[params] ')' a=['->' z=expression { z }] &&':' tc=[func_type_comment] b=block {
+    | 'async' 'doer' n=NAME t=[type_params] &&'(' params=[params] ')' a=['->' z=expression { z }] &&':' tc=[func_type_comment] b=block {
         CHECK_VERSION(
             stmt_ty,
             5,
@@ -1376,7 +1379,7 @@ invalid_for_stmt:
     | ['async'] a='for' star_targets 'in' star_expressions ':' NEWLINE !INDENT {
         RAISE_INDENTATION_ERROR("expected an indented block after 'for' statement on line %d", a->lineno) }
 invalid_def_raw:
-    | ['async'] a='def' NAME [type_params] '(' [params] ')' ['->' expression] ':' NEWLINE !INDENT {
+    | ['async'] a='doer' NAME [type_params] '(' [params] ')' ['->' expression] ':' NEWLINE !INDENT {
         RAISE_INDENTATION_ERROR("expected an indented block after function definition on line %d", a->lineno) }
 invalid_class_def_raw:
     | 'class' NAME [type_params] ['(' [arguments] ')'] NEWLINE { RAISE_SYNTAX_ERROR("expected ':'") }

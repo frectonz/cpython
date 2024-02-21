@@ -848,9 +848,9 @@ pybuilddir.txt: $(PYTHON_FOR_BUILD_DEPS)
 	fi
 
 # blake2s is auto-generated from blake2b
-$(srcdir)/Modules/_blake2/blake2s_impl.c: $(srcdir)/Modules/_blake2/blake2b_impl.c $(srcdir)/Modules/_blake2/blake2b2s.py
-	$(PYTHON_FOR_REGEN) $(srcdir)/Modules/_blake2/blake2b2s.py
-	$(PYTHON_FOR_REGEN) $(srcdir)/Tools/clinic/clinic.py -f $@
+#$(srcdir)/Modules/_blake2/blake2s_impl.c: $(srcdir)/Modules/_blake2/blake2b_impl.c $(srcdir)/Modules/_blake2/blake2b2s.py
+#	$(PYTHON_FOR_REGEN) $(srcdir)/Modules/_blake2/blake2b2s.py
+#	$(PYTHON_FOR_REGEN) $(srcdir)/Tools/clinic/clinic.py -f $@
 
 # Build static library
 $(LIBRARY): $(LIBRARY_OBJS)

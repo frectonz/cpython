@@ -16,64 +16,75 @@
 #else
 #  define MAXSTACK 6000
 #endif
-static const int n_keyword_lists = 9;
+static const int n_keyword_lists = 14;
 static KeywordToken *reserved_keywords[] = {
     (KeywordToken[]) {{NULL, -1}},
     (KeywordToken[]) {{NULL, -1}},
     (KeywordToken[]) {
-        {"if", 661},
-        {"as", 659},
-        {"in", 672},
-        {"or", 581},
-        {"is", 589},
+        {"if", 663},
+        {"as", 661},
+        {"in", 674},
+        {"or", 583},
+        {"is", 591},
         {NULL, -1},
     },
     (KeywordToken[]) {
-        {"del", 616},
-        {"def", 674},
-        {"for", 671},
-        {"try", 643},
-        {"and", 582},
-        {"not", 588},
+        {"del", 618},
+        {"for", 673},
+        {"try", 645},
+        {"and", 584},
+        {"not", 590},
         {NULL, -1},
     },
     (KeywordToken[]) {
-        {"from", 621},
+        {"from", 623},
         {"pass", 504},
-        {"with", 634},
-        {"elif", 663},
-        {"else", 664},
-        {"None", 614},
-        {"True", 613},
+        {"todo", 505},
+        {"doer", 676},
+        {"with", 636},
+        {"elif", 665},
+        {"else", 666},
+        {"None", 616},
+        {"True", 615},
         {NULL, -1},
     },
     (KeywordToken[]) {
-        {"raise", 525},
-        {"yield", 580},
-        {"break", 508},
-        {"async", 673},
-        {"class", 676},
-        {"while", 666},
-        {"False", 615},
-        {"await", 590},
+        {"raise", 527},
+        {"yield", 582},
+        {"break", 510},
+        {"async", 675},
+        {"class", 678},
+        {"while", 668},
+        {"False", 617},
+        {"await", 592},
         {NULL, -1},
     },
     (KeywordToken[]) {
-        {"return", 522},
-        {"import", 620},
-        {"assert", 529},
-        {"global", 526},
-        {"except", 656},
-        {"lambda", 612},
+        {"import", 622},
+        {"assert", 531},
+        {"global", 528},
+        {"except", 658},
+        {"lambda", 614},
         {NULL, -1},
     },
     (KeywordToken[]) {
-        {"finally", 652},
+        {"finally", 654},
         {NULL, -1},
     },
     (KeywordToken[]) {
-        {"continue", 509},
-        {"nonlocal", 527},
+        {"continue", 511},
+        {"nonlocal", 529},
+        {NULL, -1},
+    },
+    (KeywordToken[]) {
+        {"bababooey", 524},
+        {NULL, -1},
+    },
+    (KeywordToken[]) {{NULL, -1}},
+    (KeywordToken[]) {{NULL, -1}},
+    (KeywordToken[]) {{NULL, -1}},
+    (KeywordToken[]) {
+        {"unimplemented", 506},
         {NULL, -1},
     },
 };
@@ -1668,10 +1679,13 @@ simple_stmts_rule(Parser *p)
 //     | assignment
 //     | &"type" type_alias
 //     | star_expressions
-//     | &'return' return_stmt
+//     | &'bababooey' return_stmt
 //     | &('import' | 'from') import_stmt
 //     | &'raise' raise_stmt
 //     | 'pass'
+//     | 'todo'
+//     | 'unimplemented'
+//     | '.'
 //     | &'del' del_stmt
 //     | &'yield' yield_stmt
 //     | &'assert' assert_stmt
@@ -1777,26 +1791,26 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c%s simple_stmt[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "star_expressions"));
     }
-    { // &'return' return_stmt
+    { // &'bababooey' return_stmt
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'return' return_stmt"));
+        D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'bababooey' return_stmt"));
         stmt_ty return_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 522)  // token='return'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 524)  // token='bababooey'
             &&
             (return_stmt_var = return_stmt_rule(p))  // return_stmt
         )
         {
-            D(fprintf(stderr, "%*c+ simple_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "&'return' return_stmt"));
+            D(fprintf(stderr, "%*c+ simple_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "&'bababooey' return_stmt"));
             _res = return_stmt_var;
             goto done;
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s simple_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "&'return' return_stmt"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "&'bababooey' return_stmt"));
     }
     { // &('import' | 'from') import_stmt
         if (p->error_indicator) {
@@ -1827,7 +1841,7 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'raise' raise_stmt"));
         stmt_ty raise_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 525)  // token='raise'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 527)  // token='raise'
             &&
             (raise_stmt_var = raise_stmt_rule(p))  // raise_stmt
         )
@@ -1873,6 +1887,105 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c%s simple_stmt[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'pass'"));
     }
+    { // 'todo'
+        if (p->error_indicator) {
+            p->level--;
+            return NULL;
+        }
+        D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'todo'"));
+        Token * _keyword;
+        if (
+            (_keyword = _PyPegen_expect_token(p, 505))  // token='todo'
+        )
+        {
+            D(fprintf(stderr, "%*c+ simple_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'todo'"));
+            Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
+            if (_token == NULL) {
+                p->level--;
+                return NULL;
+            }
+            int _end_lineno = _token->end_lineno;
+            UNUSED(_end_lineno); // Only used by EXTRA macro
+            int _end_col_offset = _token->end_col_offset;
+            UNUSED(_end_col_offset); // Only used by EXTRA macro
+            _res = _PyAST_Pass ( EXTRA );
+            if (_res == NULL && PyErr_Occurred()) {
+                p->error_indicator = 1;
+                p->level--;
+                return NULL;
+            }
+            goto done;
+        }
+        p->mark = _mark;
+        D(fprintf(stderr, "%*c%s simple_stmt[%d-%d]: %s failed!\n", p->level, ' ',
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'todo'"));
+    }
+    { // 'unimplemented'
+        if (p->error_indicator) {
+            p->level--;
+            return NULL;
+        }
+        D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'unimplemented'"));
+        Token * _keyword;
+        if (
+            (_keyword = _PyPegen_expect_token(p, 506))  // token='unimplemented'
+        )
+        {
+            D(fprintf(stderr, "%*c+ simple_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'unimplemented'"));
+            Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
+            if (_token == NULL) {
+                p->level--;
+                return NULL;
+            }
+            int _end_lineno = _token->end_lineno;
+            UNUSED(_end_lineno); // Only used by EXTRA macro
+            int _end_col_offset = _token->end_col_offset;
+            UNUSED(_end_col_offset); // Only used by EXTRA macro
+            _res = _PyAST_Pass ( EXTRA );
+            if (_res == NULL && PyErr_Occurred()) {
+                p->error_indicator = 1;
+                p->level--;
+                return NULL;
+            }
+            goto done;
+        }
+        p->mark = _mark;
+        D(fprintf(stderr, "%*c%s simple_stmt[%d-%d]: %s failed!\n", p->level, ' ',
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'unimplemented'"));
+    }
+    { // '.'
+        if (p->error_indicator) {
+            p->level--;
+            return NULL;
+        }
+        D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'.'"));
+        Token * _literal;
+        if (
+            (_literal = _PyPegen_expect_token(p, 23))  // token='.'
+        )
+        {
+            D(fprintf(stderr, "%*c+ simple_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'.'"));
+            Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
+            if (_token == NULL) {
+                p->level--;
+                return NULL;
+            }
+            int _end_lineno = _token->end_lineno;
+            UNUSED(_end_lineno); // Only used by EXTRA macro
+            int _end_col_offset = _token->end_col_offset;
+            UNUSED(_end_col_offset); // Only used by EXTRA macro
+            _res = _PyAST_Pass ( EXTRA );
+            if (_res == NULL && PyErr_Occurred()) {
+                p->error_indicator = 1;
+                p->level--;
+                return NULL;
+            }
+            goto done;
+        }
+        p->mark = _mark;
+        D(fprintf(stderr, "%*c%s simple_stmt[%d-%d]: %s failed!\n", p->level, ' ',
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'.'"));
+    }
     { // &'del' del_stmt
         if (p->error_indicator) {
             p->level--;
@@ -1881,7 +1994,7 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'del' del_stmt"));
         stmt_ty del_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 616)  // token='del'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 618)  // token='del'
             &&
             (del_stmt_var = del_stmt_rule(p))  // del_stmt
         )
@@ -1902,7 +2015,7 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'yield' yield_stmt"));
         stmt_ty yield_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 580)  // token='yield'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 582)  // token='yield'
             &&
             (yield_stmt_var = yield_stmt_rule(p))  // yield_stmt
         )
@@ -1923,7 +2036,7 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'assert' assert_stmt"));
         stmt_ty assert_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 529)  // token='assert'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 531)  // token='assert'
             &&
             (assert_stmt_var = assert_stmt_rule(p))  // assert_stmt
         )
@@ -1944,7 +2057,7 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'break'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 508))  // token='break'
+            (_keyword = _PyPegen_expect_token(p, 510))  // token='break'
         )
         {
             D(fprintf(stderr, "%*c+ simple_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'break'"));
@@ -1977,7 +2090,7 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'continue'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 509))  // token='continue'
+            (_keyword = _PyPegen_expect_token(p, 511))  // token='continue'
         )
         {
             D(fprintf(stderr, "%*c+ simple_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'continue'"));
@@ -2010,7 +2123,7 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'global' global_stmt"));
         stmt_ty global_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 526)  // token='global'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 528)  // token='global'
             &&
             (global_stmt_var = global_stmt_rule(p))  // global_stmt
         )
@@ -2031,7 +2144,7 @@ simple_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> simple_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'nonlocal' nonlocal_stmt"));
         stmt_ty nonlocal_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 527)  // token='nonlocal'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 529)  // token='nonlocal'
             &&
             (nonlocal_stmt_var = nonlocal_stmt_rule(p))  // nonlocal_stmt
         )
@@ -2053,7 +2166,7 @@ simple_stmt_rule(Parser *p)
 
 // compound_stmt:
 //     | invalid_compound_stmt
-//     | &('def' | '@' | 'async') function_def
+//     | &('doer' | '@' | 'async') function_def
 //     | &'if' if_stmt
 //     | &('class' | '@') class_def
 //     | &('with' | 'async') with_stmt
@@ -2092,12 +2205,12 @@ compound_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c%s compound_stmt[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "invalid_compound_stmt"));
     }
-    { // &('def' | '@' | 'async') function_def
+    { // &('doer' | '@' | 'async') function_def
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> compound_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&('def' | '@' | 'async') function_def"));
+        D(fprintf(stderr, "%*c> compound_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&('doer' | '@' | 'async') function_def"));
         stmt_ty function_def_var;
         if (
             _PyPegen_lookahead(1, _tmp_7_rule, p)
@@ -2105,13 +2218,13 @@ compound_stmt_rule(Parser *p)
             (function_def_var = function_def_rule(p))  // function_def
         )
         {
-            D(fprintf(stderr, "%*c+ compound_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "&('def' | '@' | 'async') function_def"));
+            D(fprintf(stderr, "%*c+ compound_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "&('doer' | '@' | 'async') function_def"));
             _res = function_def_var;
             goto done;
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s compound_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "&('def' | '@' | 'async') function_def"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "&('doer' | '@' | 'async') function_def"));
     }
     { // &'if' if_stmt
         if (p->error_indicator) {
@@ -2121,7 +2234,7 @@ compound_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> compound_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'if' if_stmt"));
         stmt_ty if_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 661)  // token='if'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 663)  // token='if'
             &&
             (if_stmt_var = if_stmt_rule(p))  // if_stmt
         )
@@ -2205,7 +2318,7 @@ compound_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> compound_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'try' try_stmt"));
         stmt_ty try_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 643)  // token='try'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 645)  // token='try'
             &&
             (try_stmt_var = try_stmt_rule(p))  // try_stmt
         )
@@ -2226,7 +2339,7 @@ compound_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> compound_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'while' while_stmt"));
         stmt_ty while_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 666)  // token='while'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 668)  // token='while'
             &&
             (while_stmt_var = while_stmt_rule(p))  // while_stmt
         )
@@ -2888,7 +3001,7 @@ augassign_rule(Parser *p)
     return _res;
 }
 
-// return_stmt: 'return' star_expressions?
+// return_stmt: 'bababooey' star_expressions?
 static stmt_ty
 return_stmt_rule(Parser *p)
 {
@@ -2910,21 +3023,21 @@ return_stmt_rule(Parser *p)
     UNUSED(_start_lineno); // Only used by EXTRA macro
     int _start_col_offset = p->tokens[_mark]->col_offset;
     UNUSED(_start_col_offset); // Only used by EXTRA macro
-    { // 'return' star_expressions?
+    { // 'bababooey' star_expressions?
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> return_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'return' star_expressions?"));
+        D(fprintf(stderr, "%*c> return_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'bababooey' star_expressions?"));
         Token * _keyword;
         void *a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 522))  // token='return'
+            (_keyword = _PyPegen_expect_token(p, 524))  // token='bababooey'
             &&
             (a = star_expressions_rule(p), !p->error_indicator)  // star_expressions?
         )
         {
-            D(fprintf(stderr, "%*c+ return_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'return' star_expressions?"));
+            D(fprintf(stderr, "%*c+ return_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'bababooey' star_expressions?"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -2944,7 +3057,7 @@ return_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s return_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'return' star_expressions?"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'bababooey' star_expressions?"));
     }
     _res = NULL;
   done:
@@ -2984,7 +3097,7 @@ raise_stmt_rule(Parser *p)
         expr_ty a;
         void *b;
         if (
-            (_keyword = _PyPegen_expect_token(p, 525))  // token='raise'
+            (_keyword = _PyPegen_expect_token(p, 527))  // token='raise'
             &&
             (a = expression_rule(p))  // expression
             &&
@@ -3021,7 +3134,7 @@ raise_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c> raise_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'raise'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 525))  // token='raise'
+            (_keyword = _PyPegen_expect_token(p, 527))  // token='raise'
         )
         {
             D(fprintf(stderr, "%*c+ raise_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'raise'"));
@@ -3083,7 +3196,7 @@ global_stmt_rule(Parser *p)
         Token * _keyword;
         asdl_expr_seq* a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 526))  // token='global'
+            (_keyword = _PyPegen_expect_token(p, 528))  // token='global'
             &&
             (a = (asdl_expr_seq*)_gather_18_rule(p))  // ','.NAME+
         )
@@ -3147,7 +3260,7 @@ nonlocal_stmt_rule(Parser *p)
         Token * _keyword;
         asdl_expr_seq* a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 527))  // token='nonlocal'
+            (_keyword = _PyPegen_expect_token(p, 529))  // token='nonlocal'
             &&
             (a = (asdl_expr_seq*)_gather_20_rule(p))  // ','.NAME+
         )
@@ -3211,7 +3324,7 @@ del_stmt_rule(Parser *p)
         Token * _keyword;
         asdl_expr_seq* a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 616))  // token='del'
+            (_keyword = _PyPegen_expect_token(p, 618))  // token='del'
             &&
             (a = del_targets_rule(p))  // del_targets
             &&
@@ -3358,7 +3471,7 @@ assert_stmt_rule(Parser *p)
         expr_ty a;
         void *b;
         if (
-            (_keyword = _PyPegen_expect_token(p, 529))  // token='assert'
+            (_keyword = _PyPegen_expect_token(p, 531))  // token='assert'
             &&
             (a = expression_rule(p))  // expression
             &&
@@ -3500,7 +3613,7 @@ import_name_rule(Parser *p)
         Token * _keyword;
         asdl_alias_seq* a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 620))  // token='import'
+            (_keyword = _PyPegen_expect_token(p, 622))  // token='import'
             &&
             (a = dotted_as_names_rule(p))  // dotted_as_names
         )
@@ -3569,13 +3682,13 @@ import_from_rule(Parser *p)
         expr_ty b;
         asdl_alias_seq* c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 621))  // token='from'
+            (_keyword = _PyPegen_expect_token(p, 623))  // token='from'
             &&
             (a = _loop0_24_rule(p))  // (('.' | '...'))*
             &&
             (b = dotted_name_rule(p))  // dotted_name
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 620))  // token='import'
+            (_keyword_1 = _PyPegen_expect_token(p, 622))  // token='import'
             &&
             (c = import_from_targets_rule(p))  // import_from_targets
         )
@@ -3613,11 +3726,11 @@ import_from_rule(Parser *p)
         asdl_seq * a;
         asdl_alias_seq* b;
         if (
-            (_keyword = _PyPegen_expect_token(p, 621))  // token='from'
+            (_keyword = _PyPegen_expect_token(p, 623))  // token='from'
             &&
             (a = _loop1_25_rule(p))  // (('.' | '...'))+
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 620))  // token='import'
+            (_keyword_1 = _PyPegen_expect_token(p, 622))  // token='import'
             &&
             (b = import_from_targets_rule(p))  // import_from_targets
         )
@@ -4366,7 +4479,7 @@ class_def_raw_rule(Parser *p)
         asdl_stmt_seq* c;
         void *t;
         if (
-            (_keyword = _PyPegen_expect_token(p, 676))  // token='class'
+            (_keyword = _PyPegen_expect_token(p, 678))  // token='class'
             &&
             (a = _PyPegen_name_token(p))  // NAME
             &&
@@ -4474,8 +4587,8 @@ function_def_rule(Parser *p)
 
 // function_def_raw:
 //     | invalid_def_raw
-//     | 'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block
-//     | 'async' 'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block
+//     | 'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block
+//     | 'async' 'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block
 static stmt_ty
 function_def_raw_rule(Parser *p)
 {
@@ -4516,12 +4629,12 @@ function_def_raw_rule(Parser *p)
         D(fprintf(stderr, "%*c%s function_def_raw[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "invalid_def_raw"));
     }
-    { // 'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block
+    { // 'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> function_def_raw[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
+        D(fprintf(stderr, "%*c> function_def_raw[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
         Token * _keyword;
         Token * _literal;
         Token * _literal_1;
@@ -4533,7 +4646,7 @@ function_def_raw_rule(Parser *p)
         void *t;
         void *tc;
         if (
-            (_keyword = _PyPegen_expect_token(p, 674))  // token='def'
+            (_keyword = _PyPegen_expect_token(p, 676))  // token='doer'
             &&
             (n = _PyPegen_name_token(p))  // NAME
             &&
@@ -4554,7 +4667,7 @@ function_def_raw_rule(Parser *p)
             (b = block_rule(p))  // block
         )
         {
-            D(fprintf(stderr, "%*c+ function_def_raw[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
+            D(fprintf(stderr, "%*c+ function_def_raw[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -4574,14 +4687,14 @@ function_def_raw_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s function_def_raw[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
     }
-    { // 'async' 'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block
+    { // 'async' 'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> function_def_raw[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'async' 'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
+        D(fprintf(stderr, "%*c> function_def_raw[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'async' 'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
         Token * _keyword;
         Token * _keyword_1;
         Token * _literal;
@@ -4594,9 +4707,9 @@ function_def_raw_rule(Parser *p)
         void *t;
         void *tc;
         if (
-            (_keyword = _PyPegen_expect_token(p, 673))  // token='async'
+            (_keyword = _PyPegen_expect_token(p, 675))  // token='async'
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 674))  // token='def'
+            (_keyword_1 = _PyPegen_expect_token(p, 676))  // token='doer'
             &&
             (n = _PyPegen_name_token(p))  // NAME
             &&
@@ -4617,7 +4730,7 @@ function_def_raw_rule(Parser *p)
             (b = block_rule(p))  // block
         )
         {
-            D(fprintf(stderr, "%*c+ function_def_raw[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'async' 'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
+            D(fprintf(stderr, "%*c+ function_def_raw[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'async' 'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -4637,7 +4750,7 @@ function_def_raw_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s function_def_raw[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'async' 'def' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'async' 'doer' NAME type_params? &&'(' params? ')' ['->' expression] &&':' func_type_comment? block"));
     }
     _res = NULL;
   done:
@@ -5934,7 +6047,7 @@ if_stmt_rule(Parser *p)
         asdl_stmt_seq* b;
         stmt_ty c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 661))  // token='if'
+            (_keyword = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (a = named_expression_rule(p))  // named_expression
             &&
@@ -5979,7 +6092,7 @@ if_stmt_rule(Parser *p)
         asdl_stmt_seq* b;
         void *c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 661))  // token='if'
+            (_keyword = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (a = named_expression_rule(p))  // named_expression
             &&
@@ -6074,7 +6187,7 @@ elif_stmt_rule(Parser *p)
         asdl_stmt_seq* b;
         stmt_ty c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 663))  // token='elif'
+            (_keyword = _PyPegen_expect_token(p, 665))  // token='elif'
             &&
             (a = named_expression_rule(p))  // named_expression
             &&
@@ -6119,7 +6232,7 @@ elif_stmt_rule(Parser *p)
         asdl_stmt_seq* b;
         void *c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 663))  // token='elif'
+            (_keyword = _PyPegen_expect_token(p, 665))  // token='elif'
             &&
             (a = named_expression_rule(p))  // named_expression
             &&
@@ -6200,7 +6313,7 @@ else_block_rule(Parser *p)
         Token * _literal;
         asdl_stmt_seq* b;
         if (
-            (_keyword = _PyPegen_expect_token(p, 664))  // token='else'
+            (_keyword = _PyPegen_expect_token(p, 666))  // token='else'
             &&
             (_literal = _PyPegen_expect_forced_token(p, 11, ":"))  // forced_token=':'
             &&
@@ -6279,7 +6392,7 @@ while_stmt_rule(Parser *p)
         asdl_stmt_seq* b;
         void *c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 666))  // token='while'
+            (_keyword = _PyPegen_expect_token(p, 668))  // token='while'
             &&
             (a = named_expression_rule(p))  // named_expression
             &&
@@ -6379,11 +6492,11 @@ for_stmt_rule(Parser *p)
         expr_ty t;
         void *tc;
         if (
-            (_keyword = _PyPegen_expect_token(p, 671))  // token='for'
+            (_keyword = _PyPegen_expect_token(p, 673))  // token='for'
             &&
             (t = star_targets_rule(p))  // star_targets
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 672))  // token='in'
+            (_keyword_1 = _PyPegen_expect_token(p, 674))  // token='in'
             &&
             (_cut_var = 1)
             &&
@@ -6441,13 +6554,13 @@ for_stmt_rule(Parser *p)
         expr_ty t;
         void *tc;
         if (
-            (_keyword = _PyPegen_expect_token(p, 673))  // token='async'
+            (_keyword = _PyPegen_expect_token(p, 675))  // token='async'
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 671))  // token='for'
+            (_keyword_1 = _PyPegen_expect_token(p, 673))  // token='for'
             &&
             (t = star_targets_rule(p))  // star_targets
             &&
-            (_keyword_2 = _PyPegen_expect_token(p, 672))  // token='in'
+            (_keyword_2 = _PyPegen_expect_token(p, 674))  // token='in'
             &&
             (_cut_var = 1)
             &&
@@ -6576,7 +6689,7 @@ with_stmt_rule(Parser *p)
         asdl_stmt_seq* b;
         void *tc;
         if (
-            (_keyword = _PyPegen_expect_token(p, 634))  // token='with'
+            (_keyword = _PyPegen_expect_token(p, 636))  // token='with'
             &&
             (_literal = _PyPegen_expect_token(p, 7))  // token='('
             &&
@@ -6627,7 +6740,7 @@ with_stmt_rule(Parser *p)
         asdl_stmt_seq* b;
         void *tc;
         if (
-            (_keyword = _PyPegen_expect_token(p, 634))  // token='with'
+            (_keyword = _PyPegen_expect_token(p, 636))  // token='with'
             &&
             (a = (asdl_withitem_seq*)_gather_53_rule(p))  // ','.with_item+
             &&
@@ -6676,9 +6789,9 @@ with_stmt_rule(Parser *p)
         asdl_withitem_seq* a;
         asdl_stmt_seq* b;
         if (
-            (_keyword = _PyPegen_expect_token(p, 673))  // token='async'
+            (_keyword = _PyPegen_expect_token(p, 675))  // token='async'
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 634))  // token='with'
+            (_keyword_1 = _PyPegen_expect_token(p, 636))  // token='with'
             &&
             (_literal = _PyPegen_expect_token(p, 7))  // token='('
             &&
@@ -6728,9 +6841,9 @@ with_stmt_rule(Parser *p)
         asdl_stmt_seq* b;
         void *tc;
         if (
-            (_keyword = _PyPegen_expect_token(p, 673))  // token='async'
+            (_keyword = _PyPegen_expect_token(p, 675))  // token='async'
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 634))  // token='with'
+            (_keyword_1 = _PyPegen_expect_token(p, 636))  // token='with'
             &&
             (a = (asdl_withitem_seq*)_gather_57_rule(p))  // ','.with_item+
             &&
@@ -6816,7 +6929,7 @@ with_item_rule(Parser *p)
         if (
             (e = expression_rule(p))  // expression
             &&
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (t = star_target_rule(p))  // star_target
             &&
@@ -6941,7 +7054,7 @@ try_stmt_rule(Parser *p)
         asdl_stmt_seq* b;
         asdl_stmt_seq* f;
         if (
-            (_keyword = _PyPegen_expect_token(p, 643))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
             &&
             (_literal = _PyPegen_expect_forced_token(p, 11, ":"))  // forced_token=':'
             &&
@@ -6985,7 +7098,7 @@ try_stmt_rule(Parser *p)
         asdl_excepthandler_seq* ex;
         void *f;
         if (
-            (_keyword = _PyPegen_expect_token(p, 643))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
             &&
             (_literal = _PyPegen_expect_forced_token(p, 11, ":"))  // forced_token=':'
             &&
@@ -7033,7 +7146,7 @@ try_stmt_rule(Parser *p)
         asdl_excepthandler_seq* ex;
         void *f;
         if (
-            (_keyword = _PyPegen_expect_token(p, 643))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
             &&
             (_literal = _PyPegen_expect_forced_token(p, 11, ":"))  // forced_token=':'
             &&
@@ -7131,7 +7244,7 @@ except_block_rule(Parser *p)
         expr_ty e;
         void *t;
         if (
-            (_keyword = _PyPegen_expect_token(p, 656))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (e = expression_rule(p))  // expression
             &&
@@ -7174,7 +7287,7 @@ except_block_rule(Parser *p)
         Token * _literal;
         asdl_stmt_seq* b;
         if (
-            (_keyword = _PyPegen_expect_token(p, 656))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -7285,7 +7398,7 @@ except_star_block_rule(Parser *p)
         expr_ty e;
         void *t;
         if (
-            (_keyword = _PyPegen_expect_token(p, 656))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (_literal = _PyPegen_expect_token(p, 16))  // token='*'
             &&
@@ -7387,7 +7500,7 @@ finally_block_rule(Parser *p)
         Token * _literal;
         asdl_stmt_seq* a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 652))  // token='finally'
+            (_keyword = _PyPegen_expect_token(p, 654))  // token='finally'
             &&
             (_literal = _PyPegen_expect_forced_token(p, 11, ":"))  // forced_token=':'
             &&
@@ -7695,7 +7808,7 @@ guard_rule(Parser *p)
         Token * _keyword;
         expr_ty guard;
         if (
-            (_keyword = _PyPegen_expect_token(p, 661))  // token='if'
+            (_keyword = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (guard = named_expression_rule(p))  // named_expression
         )
@@ -7890,7 +8003,7 @@ as_pattern_rule(Parser *p)
         if (
             (pattern = or_pattern_rule(p))  // or_pattern
             &&
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (target = pattern_capture_target_rule(p))  // pattern_capture_target
         )
@@ -8324,7 +8437,7 @@ literal_pattern_rule(Parser *p)
         D(fprintf(stderr, "%*c> literal_pattern[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'None'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 614))  // token='None'
+            (_keyword = _PyPegen_expect_token(p, 616))  // token='None'
         )
         {
             D(fprintf(stderr, "%*c+ literal_pattern[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'None'"));
@@ -8357,7 +8470,7 @@ literal_pattern_rule(Parser *p)
         D(fprintf(stderr, "%*c> literal_pattern[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'True'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 613))  // token='True'
+            (_keyword = _PyPegen_expect_token(p, 615))  // token='True'
         )
         {
             D(fprintf(stderr, "%*c+ literal_pattern[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'True'"));
@@ -8390,7 +8503,7 @@ literal_pattern_rule(Parser *p)
         D(fprintf(stderr, "%*c> literal_pattern[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'False'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 615))  // token='False'
+            (_keyword = _PyPegen_expect_token(p, 617))  // token='False'
         )
         {
             D(fprintf(stderr, "%*c+ literal_pattern[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'False'"));
@@ -8516,7 +8629,7 @@ literal_expr_rule(Parser *p)
         D(fprintf(stderr, "%*c> literal_expr[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'None'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 614))  // token='None'
+            (_keyword = _PyPegen_expect_token(p, 616))  // token='None'
         )
         {
             D(fprintf(stderr, "%*c+ literal_expr[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'None'"));
@@ -8549,7 +8662,7 @@ literal_expr_rule(Parser *p)
         D(fprintf(stderr, "%*c> literal_expr[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'True'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 613))  // token='True'
+            (_keyword = _PyPegen_expect_token(p, 615))  // token='True'
         )
         {
             D(fprintf(stderr, "%*c+ literal_expr[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'True'"));
@@ -8582,7 +8695,7 @@ literal_expr_rule(Parser *p)
         D(fprintf(stderr, "%*c> literal_expr[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'False'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 615))  // token='False'
+            (_keyword = _PyPegen_expect_token(p, 617))  // token='False'
         )
         {
             D(fprintf(stderr, "%*c+ literal_expr[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'False'"));
@@ -11113,11 +11226,11 @@ expression_rule(Parser *p)
         if (
             (a = disjunction_rule(p))  // disjunction
             &&
-            (_keyword = _PyPegen_expect_token(p, 661))  // token='if'
+            (_keyword = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (b = disjunction_rule(p))  // disjunction
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 664))  // token='else'
+            (_keyword_1 = _PyPegen_expect_token(p, 666))  // token='else'
             &&
             (c = expression_rule(p))  // expression
         )
@@ -11221,9 +11334,9 @@ yield_expr_rule(Parser *p)
         Token * _keyword_1;
         expr_ty a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 580))  // token='yield'
+            (_keyword = _PyPegen_expect_token(p, 582))  // token='yield'
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 621))  // token='from'
+            (_keyword_1 = _PyPegen_expect_token(p, 623))  // token='from'
             &&
             (a = expression_rule(p))  // expression
         )
@@ -11259,7 +11372,7 @@ yield_expr_rule(Parser *p)
         Token * _keyword;
         void *a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 580))  // token='yield'
+            (_keyword = _PyPegen_expect_token(p, 582))  // token='yield'
             &&
             (a = star_expressions_rule(p), !p->error_indicator)  // star_expressions?
         )
@@ -11999,7 +12112,7 @@ inversion_rule(Parser *p)
         Token * _keyword;
         expr_ty a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 588))  // token='not'
+            (_keyword = _PyPegen_expect_token(p, 590))  // token='not'
             &&
             (a = inversion_rule(p))  // inversion
         )
@@ -12653,9 +12766,9 @@ notin_bitwise_or_rule(Parser *p)
         Token * _keyword_1;
         expr_ty a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 588))  // token='not'
+            (_keyword = _PyPegen_expect_token(p, 590))  // token='not'
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 672))  // token='in'
+            (_keyword_1 = _PyPegen_expect_token(p, 674))  // token='in'
             &&
             (a = bitwise_or_rule(p))  // bitwise_or
         )
@@ -12701,7 +12814,7 @@ in_bitwise_or_rule(Parser *p)
         Token * _keyword;
         expr_ty a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 672))  // token='in'
+            (_keyword = _PyPegen_expect_token(p, 674))  // token='in'
             &&
             (a = bitwise_or_rule(p))  // bitwise_or
         )
@@ -12748,9 +12861,9 @@ isnot_bitwise_or_rule(Parser *p)
         Token * _keyword_1;
         expr_ty a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 589))  // token='is'
+            (_keyword = _PyPegen_expect_token(p, 591))  // token='is'
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 588))  // token='not'
+            (_keyword_1 = _PyPegen_expect_token(p, 590))  // token='not'
             &&
             (a = bitwise_or_rule(p))  // bitwise_or
         )
@@ -12796,7 +12909,7 @@ is_bitwise_or_rule(Parser *p)
         Token * _keyword;
         expr_ty a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 589))  // token='is'
+            (_keyword = _PyPegen_expect_token(p, 591))  // token='is'
             &&
             (a = bitwise_or_rule(p))  // bitwise_or
         )
@@ -14073,7 +14186,7 @@ await_primary_rule(Parser *p)
         Token * _keyword;
         expr_ty a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 590))  // token='await'
+            (_keyword = _PyPegen_expect_token(p, 592))  // token='await'
             &&
             (a = primary_rule(p))  // primary
         )
@@ -14617,7 +14730,7 @@ atom_rule(Parser *p)
         D(fprintf(stderr, "%*c> atom[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'True'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 613))  // token='True'
+            (_keyword = _PyPegen_expect_token(p, 615))  // token='True'
         )
         {
             D(fprintf(stderr, "%*c+ atom[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'True'"));
@@ -14650,7 +14763,7 @@ atom_rule(Parser *p)
         D(fprintf(stderr, "%*c> atom[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'False'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 615))  // token='False'
+            (_keyword = _PyPegen_expect_token(p, 617))  // token='False'
         )
         {
             D(fprintf(stderr, "%*c+ atom[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'False'"));
@@ -14683,7 +14796,7 @@ atom_rule(Parser *p)
         D(fprintf(stderr, "%*c> atom[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'None'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 614))  // token='None'
+            (_keyword = _PyPegen_expect_token(p, 616))  // token='None'
         )
         {
             D(fprintf(stderr, "%*c+ atom[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'None'"));
@@ -14951,7 +15064,7 @@ lambdef_rule(Parser *p)
         void *a;
         expr_ty b;
         if (
-            (_keyword = _PyPegen_expect_token(p, 612))  // token='lambda'
+            (_keyword = _PyPegen_expect_token(p, 614))  // token='lambda'
             &&
             (a = lambda_params_rule(p), !p->error_indicator)  // lambda_params?
             &&
@@ -16882,13 +16995,13 @@ for_if_clause_rule(Parser *p)
         expr_ty b;
         asdl_expr_seq* c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 673))  // token='async'
+            (_keyword = _PyPegen_expect_token(p, 675))  // token='async'
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 671))  // token='for'
+            (_keyword_1 = _PyPegen_expect_token(p, 673))  // token='for'
             &&
             (a = star_targets_rule(p))  // star_targets
             &&
-            (_keyword_2 = _PyPegen_expect_token(p, 672))  // token='in'
+            (_keyword_2 = _PyPegen_expect_token(p, 674))  // token='in'
             &&
             (_cut_var = 1)
             &&
@@ -16927,11 +17040,11 @@ for_if_clause_rule(Parser *p)
         expr_ty b;
         asdl_expr_seq* c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 671))  // token='for'
+            (_keyword = _PyPegen_expect_token(p, 673))  // token='for'
             &&
             (a = star_targets_rule(p))  // star_targets
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 672))  // token='in'
+            (_keyword_1 = _PyPegen_expect_token(p, 674))  // token='in'
             &&
             (_cut_var = 1)
             &&
@@ -16968,13 +17081,13 @@ for_if_clause_rule(Parser *p)
         UNUSED(_opt_var); // Silence compiler warnings
         void *_tmp_122_var;
         if (
-            (_opt_var = _PyPegen_expect_token(p, 673), !p->error_indicator)  // 'async'?
+            (_opt_var = _PyPegen_expect_token(p, 675), !p->error_indicator)  // 'async'?
             &&
-            (_keyword = _PyPegen_expect_token(p, 671))  // token='for'
+            (_keyword = _PyPegen_expect_token(p, 673))  // token='for'
             &&
             (_tmp_122_var = _tmp_122_rule(p))  // bitwise_or ((',' bitwise_or))* ','?
             &&
-            _PyPegen_lookahead_with_int(0, _PyPegen_expect_token, p, 672)  // token='in'
+            _PyPegen_lookahead_with_int(0, _PyPegen_expect_token, p, 674)  // token='in'
         )
         {
             D(fprintf(stderr, "%*c+ for_if_clause[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'async'? 'for' (bitwise_or ((',' bitwise_or))* ','?) !'in'"));
@@ -20224,11 +20337,11 @@ expression_without_invalid_rule(Parser *p)
         if (
             (a = disjunction_rule(p))  // disjunction
             &&
-            (_keyword = _PyPegen_expect_token(p, 661))  // token='if'
+            (_keyword = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (b = disjunction_rule(p))  // disjunction
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 664))  // token='else'
+            (_keyword_1 = _PyPegen_expect_token(p, 666))  // token='else'
             &&
             (c = expression_rule(p))  // expression
         )
@@ -20409,7 +20522,7 @@ invalid_expression_rule(Parser *p)
         if (
             (a = disjunction_rule(p))  // disjunction
             &&
-            (_keyword = _PyPegen_expect_token(p, 661))  // token='if'
+            (_keyword = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (b = disjunction_rule(p))  // disjunction
             &&
@@ -20440,7 +20553,7 @@ invalid_expression_rule(Parser *p)
         Token * a;
         Token * b;
         if (
-            (a = _PyPegen_expect_token(p, 612))  // token='lambda'
+            (a = _PyPegen_expect_token(p, 614))  // token='lambda'
             &&
             (_opt_var = lambda_params_rule(p), !p->error_indicator)  // lambda_params?
             &&
@@ -20911,7 +21024,7 @@ invalid_del_stmt_rule(Parser *p)
         Token * _keyword;
         expr_ty a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 616))  // token='del'
+            (_keyword = _PyPegen_expect_token(p, 618))  // token='del'
             &&
             (a = star_expressions_rule(p))  // star_expressions
         )
@@ -22347,7 +22460,7 @@ invalid_with_item_rule(Parser *p)
         if (
             (expression_var = expression_rule(p))  // expression
             &&
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (a = expression_rule(p))  // expression
             &&
@@ -22397,9 +22510,9 @@ invalid_for_target_rule(Parser *p)
         UNUSED(_opt_var); // Silence compiler warnings
         expr_ty a;
         if (
-            (_opt_var = _PyPegen_expect_token(p, 673), !p->error_indicator)  // 'async'?
+            (_opt_var = _PyPegen_expect_token(p, 675), !p->error_indicator)  // 'async'?
             &&
-            (_keyword = _PyPegen_expect_token(p, 671))  // token='for'
+            (_keyword = _PyPegen_expect_token(p, 673))  // token='for'
             &&
             (a = star_expressions_rule(p))  // star_expressions
         )
@@ -22529,11 +22642,11 @@ invalid_import_rule(Parser *p)
         Token * a;
         expr_ty dotted_name_var;
         if (
-            (a = _PyPegen_expect_token(p, 620))  // token='import'
+            (a = _PyPegen_expect_token(p, 622))  // token='import'
             &&
             (_gather_204_var = _gather_204_rule(p))  // ','.dotted_name+
             &&
-            (_keyword = _PyPegen_expect_token(p, 621))  // token='from'
+            (_keyword = _PyPegen_expect_token(p, 623))  // token='from'
             &&
             (dotted_name_var = dotted_name_rule(p))  // dotted_name
         )
@@ -22629,7 +22742,7 @@ invalid_compound_stmt_rule(Parser *p)
         Token * a;
         expr_ty named_expression_var;
         if (
-            (a = _PyPegen_expect_token(p, 663))  // token='elif'
+            (a = _PyPegen_expect_token(p, 665))  // token='elif'
             &&
             (named_expression_var = named_expression_rule(p))  // named_expression
             &&
@@ -22658,7 +22771,7 @@ invalid_compound_stmt_rule(Parser *p)
         Token * _literal;
         Token * a;
         if (
-            (a = _PyPegen_expect_token(p, 664))  // token='else'
+            (a = _PyPegen_expect_token(p, 666))  // token='else'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
         )
@@ -22709,9 +22822,9 @@ invalid_with_stmt_rule(Parser *p)
         UNUSED(_opt_var); // Silence compiler warnings
         Token * newline_var;
         if (
-            (_opt_var = _PyPegen_expect_token(p, 673), !p->error_indicator)  // 'async'?
+            (_opt_var = _PyPegen_expect_token(p, 675), !p->error_indicator)  // 'async'?
             &&
-            (_keyword = _PyPegen_expect_token(p, 634))  // token='with'
+            (_keyword = _PyPegen_expect_token(p, 636))  // token='with'
             &&
             (_gather_206_var = _gather_206_rule(p))  // ','.(expression ['as' star_target])+
             &&
@@ -22747,9 +22860,9 @@ invalid_with_stmt_rule(Parser *p)
         UNUSED(_opt_var_1); // Silence compiler warnings
         Token * newline_var;
         if (
-            (_opt_var = _PyPegen_expect_token(p, 673), !p->error_indicator)  // 'async'?
+            (_opt_var = _PyPegen_expect_token(p, 675), !p->error_indicator)  // 'async'?
             &&
-            (_keyword = _PyPegen_expect_token(p, 634))  // token='with'
+            (_keyword = _PyPegen_expect_token(p, 636))  // token='with'
             &&
             (_literal = _PyPegen_expect_token(p, 7))  // token='('
             &&
@@ -22809,9 +22922,9 @@ invalid_with_stmt_indent_rule(Parser *p)
         Token * a;
         Token * newline_var;
         if (
-            (_opt_var = _PyPegen_expect_token(p, 673), !p->error_indicator)  // 'async'?
+            (_opt_var = _PyPegen_expect_token(p, 675), !p->error_indicator)  // 'async'?
             &&
-            (a = _PyPegen_expect_token(p, 634))  // token='with'
+            (a = _PyPegen_expect_token(p, 636))  // token='with'
             &&
             (_gather_210_var = _gather_210_rule(p))  // ','.(expression ['as' star_target])+
             &&
@@ -22852,9 +22965,9 @@ invalid_with_stmt_indent_rule(Parser *p)
         Token * a;
         Token * newline_var;
         if (
-            (_opt_var = _PyPegen_expect_token(p, 673), !p->error_indicator)  // 'async'?
+            (_opt_var = _PyPegen_expect_token(p, 675), !p->error_indicator)  // 'async'?
             &&
-            (a = _PyPegen_expect_token(p, 634))  // token='with'
+            (a = _PyPegen_expect_token(p, 636))  // token='with'
             &&
             (_literal = _PyPegen_expect_token(p, 7))  // token='('
             &&
@@ -22917,7 +23030,7 @@ invalid_try_stmt_rule(Parser *p)
         Token * a;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 643))  // token='try'
+            (a = _PyPegen_expect_token(p, 645))  // token='try'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -22949,7 +23062,7 @@ invalid_try_stmt_rule(Parser *p)
         Token * _literal;
         asdl_stmt_seq* block_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 643))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -22988,7 +23101,7 @@ invalid_try_stmt_rule(Parser *p)
         Token * b;
         expr_ty expression_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 643))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -22996,7 +23109,7 @@ invalid_try_stmt_rule(Parser *p)
             &&
             (_loop1_216_var = _loop1_216_rule(p))  // except_block+
             &&
-            (a = _PyPegen_expect_token(p, 656))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (b = _PyPegen_expect_token(p, 16))  // token='*'
             &&
@@ -23035,7 +23148,7 @@ invalid_try_stmt_rule(Parser *p)
         UNUSED(_opt_var); // Silence compiler warnings
         Token * a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 643))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -23043,7 +23156,7 @@ invalid_try_stmt_rule(Parser *p)
             &&
             (_loop1_219_var = _loop1_219_rule(p))  // except_star_block+
             &&
-            (a = _PyPegen_expect_token(p, 656))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (_opt_var = _tmp_220_rule(p), !p->error_indicator)  // [expression ['as' NAME]]
             &&
@@ -23102,7 +23215,7 @@ invalid_except_stmt_rule(Parser *p)
         expr_ty a;
         expr_ty expressions_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 656))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (_opt_var = _PyPegen_expect_token(p, 16), !p->error_indicator)  // '*'?
             &&
@@ -23144,7 +23257,7 @@ invalid_except_stmt_rule(Parser *p)
         expr_ty expression_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 656))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (_opt_var = _PyPegen_expect_token(p, 16), !p->error_indicator)  // '*'?
             &&
@@ -23177,7 +23290,7 @@ invalid_except_stmt_rule(Parser *p)
         Token * a;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 656))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (newline_var = _PyPegen_expect_token(p, NEWLINE))  // token='NEWLINE'
         )
@@ -23205,7 +23318,7 @@ invalid_except_stmt_rule(Parser *p)
         void *_tmp_223_var;
         Token * a;
         if (
-            (a = _PyPegen_expect_token(p, 656))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (_literal = _PyPegen_expect_token(p, 16))  // token='*'
             &&
@@ -23254,7 +23367,7 @@ invalid_finally_stmt_rule(Parser *p)
         Token * a;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 652))  // token='finally'
+            (a = _PyPegen_expect_token(p, 654))  // token='finally'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -23310,7 +23423,7 @@ invalid_except_stmt_indent_rule(Parser *p)
         expr_ty expression_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 656))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (expression_var = expression_rule(p))  // expression
             &&
@@ -23346,7 +23459,7 @@ invalid_except_stmt_indent_rule(Parser *p)
         Token * a;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 656))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -23402,7 +23515,7 @@ invalid_except_star_stmt_indent_rule(Parser *p)
         expr_ty expression_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 656))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='except'
             &&
             (_literal = _PyPegen_expect_token(p, 16))  // token='*'
             &&
@@ -23641,7 +23754,7 @@ invalid_as_pattern_rule(Parser *p)
         if (
             (or_pattern_var = or_pattern_rule(p))  // or_pattern
             &&
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (a = _PyPegen_expect_soft_keyword(p, "_"))  // soft_keyword='"_"'
         )
@@ -23671,7 +23784,7 @@ invalid_as_pattern_rule(Parser *p)
         if (
             (or_pattern_var = or_pattern_rule(p))  // or_pattern
             &&
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             _PyPegen_lookahead_with_name(0, _PyPegen_name_token, p)
             &&
@@ -23825,7 +23938,7 @@ invalid_if_stmt_rule(Parser *p)
         expr_ty named_expression_var;
         Token * newline_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 661))  // token='if'
+            (_keyword = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (named_expression_var = named_expression_rule(p))  // named_expression
             &&
@@ -23856,7 +23969,7 @@ invalid_if_stmt_rule(Parser *p)
         expr_ty a_1;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 661))  // token='if'
+            (a = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (a_1 = named_expression_rule(p))  // named_expression
             &&
@@ -23911,7 +24024,7 @@ invalid_elif_stmt_rule(Parser *p)
         expr_ty named_expression_var;
         Token * newline_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 663))  // token='elif'
+            (_keyword = _PyPegen_expect_token(p, 665))  // token='elif'
             &&
             (named_expression_var = named_expression_rule(p))  // named_expression
             &&
@@ -23942,7 +24055,7 @@ invalid_elif_stmt_rule(Parser *p)
         expr_ty named_expression_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 663))  // token='elif'
+            (a = _PyPegen_expect_token(p, 665))  // token='elif'
             &&
             (named_expression_var = named_expression_rule(p))  // named_expression
             &&
@@ -23995,7 +24108,7 @@ invalid_else_stmt_rule(Parser *p)
         Token * a;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 664))  // token='else'
+            (a = _PyPegen_expect_token(p, 666))  // token='else'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -24048,7 +24161,7 @@ invalid_while_stmt_rule(Parser *p)
         expr_ty named_expression_var;
         Token * newline_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 666))  // token='while'
+            (_keyword = _PyPegen_expect_token(p, 668))  // token='while'
             &&
             (named_expression_var = named_expression_rule(p))  // named_expression
             &&
@@ -24079,7 +24192,7 @@ invalid_while_stmt_rule(Parser *p)
         expr_ty named_expression_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 666))  // token='while'
+            (a = _PyPegen_expect_token(p, 668))  // token='while'
             &&
             (named_expression_var = named_expression_rule(p))  // named_expression
             &&
@@ -24138,13 +24251,13 @@ invalid_for_stmt_rule(Parser *p)
         expr_ty star_expressions_var;
         expr_ty star_targets_var;
         if (
-            (_opt_var = _PyPegen_expect_token(p, 673), !p->error_indicator)  // 'async'?
+            (_opt_var = _PyPegen_expect_token(p, 675), !p->error_indicator)  // 'async'?
             &&
-            (_keyword = _PyPegen_expect_token(p, 671))  // token='for'
+            (_keyword = _PyPegen_expect_token(p, 673))  // token='for'
             &&
             (star_targets_var = star_targets_rule(p))  // star_targets
             &&
-            (_keyword_1 = _PyPegen_expect_token(p, 672))  // token='in'
+            (_keyword_1 = _PyPegen_expect_token(p, 674))  // token='in'
             &&
             (star_expressions_var = star_expressions_rule(p))  // star_expressions
             &&
@@ -24179,13 +24292,13 @@ invalid_for_stmt_rule(Parser *p)
         expr_ty star_expressions_var;
         expr_ty star_targets_var;
         if (
-            (_opt_var = _PyPegen_expect_token(p, 673), !p->error_indicator)  // 'async'?
+            (_opt_var = _PyPegen_expect_token(p, 675), !p->error_indicator)  // 'async'?
             &&
-            (a = _PyPegen_expect_token(p, 671))  // token='for'
+            (a = _PyPegen_expect_token(p, 673))  // token='for'
             &&
             (star_targets_var = star_targets_rule(p))  // star_targets
             &&
-            (_keyword = _PyPegen_expect_token(p, 672))  // token='in'
+            (_keyword = _PyPegen_expect_token(p, 674))  // token='in'
             &&
             (star_expressions_var = star_expressions_rule(p))  // star_expressions
             &&
@@ -24216,7 +24329,7 @@ invalid_for_stmt_rule(Parser *p)
 }
 
 // invalid_def_raw:
-//     | 'async'? 'def' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT
+//     | 'async'? 'doer' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT
 static void *
 invalid_def_raw_rule(Parser *p)
 {
@@ -24229,12 +24342,12 @@ invalid_def_raw_rule(Parser *p)
     }
     void * _res = NULL;
     int _mark = p->mark;
-    { // 'async'? 'def' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT
+    { // 'async'? 'doer' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_def_raw[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'async'? 'def' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT"));
+        D(fprintf(stderr, "%*c> invalid_def_raw[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'async'? 'doer' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT"));
         Token * _literal;
         Token * _literal_1;
         Token * _literal_2;
@@ -24250,9 +24363,9 @@ invalid_def_raw_rule(Parser *p)
         expr_ty name_var;
         Token * newline_var;
         if (
-            (_opt_var = _PyPegen_expect_token(p, 673), !p->error_indicator)  // 'async'?
+            (_opt_var = _PyPegen_expect_token(p, 675), !p->error_indicator)  // 'async'?
             &&
-            (a = _PyPegen_expect_token(p, 674))  // token='def'
+            (a = _PyPegen_expect_token(p, 676))  // token='doer'
             &&
             (name_var = _PyPegen_name_token(p))  // NAME
             &&
@@ -24273,7 +24386,7 @@ invalid_def_raw_rule(Parser *p)
             _PyPegen_lookahead_with_int(0, _PyPegen_expect_token, p, INDENT)  // token=INDENT
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_def_raw[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'async'? 'def' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT"));
+            D(fprintf(stderr, "%*c+ invalid_def_raw[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'async'? 'doer' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT"));
             _res = RAISE_INDENTATION_ERROR ( "expected an indented block after function definition on line %d" , a -> lineno );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
@@ -24284,7 +24397,7 @@ invalid_def_raw_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_def_raw[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'async'? 'def' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'async'? 'doer' NAME type_params? '(' params? ')' ['->' expression] ':' NEWLINE !INDENT"));
     }
     _res = NULL;
   done:
@@ -24321,7 +24434,7 @@ invalid_class_def_raw_rule(Parser *p)
         expr_ty name_var;
         Token * newline_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 676))  // token='class'
+            (_keyword = _PyPegen_expect_token(p, 678))  // token='class'
             &&
             (name_var = _PyPegen_name_token(p))  // NAME
             &&
@@ -24360,7 +24473,7 @@ invalid_class_def_raw_rule(Parser *p)
         expr_ty name_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 676))  // token='class'
+            (a = _PyPegen_expect_token(p, 678))  // token='class'
             &&
             (name_var = _PyPegen_name_token(p))  // NAME
             &&
@@ -25451,7 +25564,7 @@ _tmp_6_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_6[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'import'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 620))  // token='import'
+            (_keyword = _PyPegen_expect_token(p, 622))  // token='import'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_6[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'import'"));
@@ -25470,7 +25583,7 @@ _tmp_6_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_6[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'from'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 621))  // token='from'
+            (_keyword = _PyPegen_expect_token(p, 623))  // token='from'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_6[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'from'"));
@@ -25487,7 +25600,7 @@ _tmp_6_rule(Parser *p)
     return _res;
 }
 
-// _tmp_7: 'def' | '@' | 'async'
+// _tmp_7: 'doer' | '@' | 'async'
 static void *
 _tmp_7_rule(Parser *p)
 {
@@ -25500,24 +25613,24 @@ _tmp_7_rule(Parser *p)
     }
     void * _res = NULL;
     int _mark = p->mark;
-    { // 'def'
+    { // 'doer'
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> _tmp_7[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'def'"));
+        D(fprintf(stderr, "%*c> _tmp_7[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'doer'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 674))  // token='def'
+            (_keyword = _PyPegen_expect_token(p, 676))  // token='doer'
         )
         {
-            D(fprintf(stderr, "%*c+ _tmp_7[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'def'"));
+            D(fprintf(stderr, "%*c+ _tmp_7[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'doer'"));
             _res = _keyword;
             goto done;
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s _tmp_7[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'def'"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'doer'"));
     }
     { // '@'
         if (p->error_indicator) {
@@ -25546,7 +25659,7 @@ _tmp_7_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_7[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'async'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 673))  // token='async'
+            (_keyword = _PyPegen_expect_token(p, 675))  // token='async'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_7[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'async'"));
@@ -25584,7 +25697,7 @@ _tmp_8_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_8[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'class'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 676))  // token='class'
+            (_keyword = _PyPegen_expect_token(p, 678))  // token='class'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_8[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'class'"));
@@ -25641,7 +25754,7 @@ _tmp_9_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_9[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'with'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 634))  // token='with'
+            (_keyword = _PyPegen_expect_token(p, 636))  // token='with'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_9[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'with'"));
@@ -25660,7 +25773,7 @@ _tmp_9_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_9[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'async'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 673))  // token='async'
+            (_keyword = _PyPegen_expect_token(p, 675))  // token='async'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_9[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'async'"));
@@ -25698,7 +25811,7 @@ _tmp_10_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_10[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'for'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 671))  // token='for'
+            (_keyword = _PyPegen_expect_token(p, 673))  // token='for'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_10[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'for'"));
@@ -25717,7 +25830,7 @@ _tmp_10_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_10[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'async'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 673))  // token='async'
+            (_keyword = _PyPegen_expect_token(p, 675))  // token='async'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_10[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'async'"));
@@ -26102,7 +26215,7 @@ _tmp_17_rule(Parser *p)
         Token * _keyword;
         expr_ty z;
         if (
-            (_keyword = _PyPegen_expect_token(p, 621))  // token='from'
+            (_keyword = _PyPegen_expect_token(p, 623))  // token='from'
             &&
             (z = expression_rule(p))  // expression
         )
@@ -26741,7 +26854,7 @@ _tmp_28_rule(Parser *p)
         Token * _keyword;
         expr_ty z;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (z = _PyPegen_name_token(p))  // NAME
         )
@@ -26904,7 +27017,7 @@ _tmp_31_rule(Parser *p)
         Token * _keyword;
         expr_ty z;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (z = _PyPegen_name_token(p))  // NAME
         )
@@ -28891,7 +29004,7 @@ _tmp_62_rule(Parser *p)
         Token * _keyword;
         expr_ty z;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (z = _PyPegen_name_token(p))  // NAME
         )
@@ -28937,7 +29050,7 @@ _tmp_63_rule(Parser *p)
         Token * _keyword;
         expr_ty z;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (z = _PyPegen_name_token(p))  // NAME
         )
@@ -34587,7 +34700,7 @@ _tmp_155_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_155[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'True'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 613))  // token='True'
+            (_keyword = _PyPegen_expect_token(p, 615))  // token='True'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_155[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'True'"));
@@ -34606,7 +34719,7 @@ _tmp_155_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_155[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'False'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 615))  // token='False'
+            (_keyword = _PyPegen_expect_token(p, 617))  // token='False'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_155[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'False'"));
@@ -34625,7 +34738,7 @@ _tmp_155_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_155[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'None'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 614))  // token='None'
+            (_keyword = _PyPegen_expect_token(p, 616))  // token='None'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_155[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'None'"));
@@ -34764,7 +34877,7 @@ _tmp_158_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_158[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'else'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 664))  // token='else'
+            (_keyword = _PyPegen_expect_token(p, 666))  // token='else'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_158[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'else'"));
@@ -34935,7 +35048,7 @@ _tmp_160_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_160[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'True'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 613))  // token='True'
+            (_keyword = _PyPegen_expect_token(p, 615))  // token='True'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_160[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'True'"));
@@ -34954,7 +35067,7 @@ _tmp_160_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_160[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'None'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 614))  // token='None'
+            (_keyword = _PyPegen_expect_token(p, 616))  // token='None'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_160[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'None'"));
@@ -34973,7 +35086,7 @@ _tmp_160_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_160[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'False'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 615))  // token='False'
+            (_keyword = _PyPegen_expect_token(p, 617))  // token='False'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_160[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'False'"));
@@ -38357,7 +38470,7 @@ _tmp_214_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_214[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 656))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_214[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except'"));
@@ -38376,7 +38489,7 @@ _tmp_214_rule(Parser *p)
         D(fprintf(stderr, "%*c> _tmp_214[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'finally'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 652))  // token='finally'
+            (_keyword = _PyPegen_expect_token(p, 654))  // token='finally'
         )
         {
             D(fprintf(stderr, "%*c+ _tmp_214[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'finally'"));
@@ -38554,7 +38667,7 @@ _tmp_217_rule(Parser *p)
         Token * _keyword;
         expr_ty name_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (name_var = _PyPegen_name_token(p))  // NAME
         )
@@ -38776,7 +38889,7 @@ _tmp_221_rule(Parser *p)
         Token * _keyword;
         expr_ty name_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (name_var = _PyPegen_name_token(p))  // NAME
         )
@@ -38817,7 +38930,7 @@ _tmp_222_rule(Parser *p)
         Token * _keyword;
         expr_ty name_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (name_var = _PyPegen_name_token(p))  // NAME
         )
@@ -38915,7 +39028,7 @@ _tmp_224_rule(Parser *p)
         Token * _keyword;
         expr_ty name_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (name_var = _PyPegen_name_token(p))  // NAME
         )
@@ -38956,7 +39069,7 @@ _tmp_225_rule(Parser *p)
         Token * _keyword;
         expr_ty name_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (name_var = _PyPegen_name_token(p))  // NAME
         )
@@ -40575,7 +40688,7 @@ _tmp_255_rule(Parser *p)
         Token * _keyword;
         expr_ty c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 581))  // token='or'
+            (_keyword = _PyPegen_expect_token(p, 583))  // token='or'
             &&
             (c = conjunction_rule(p))  // conjunction
         )
@@ -40621,7 +40734,7 @@ _tmp_256_rule(Parser *p)
         Token * _keyword;
         expr_ty c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 582))  // token='and'
+            (_keyword = _PyPegen_expect_token(p, 584))  // token='and'
             &&
             (c = inversion_rule(p))  // inversion
         )
@@ -40781,7 +40894,7 @@ _tmp_259_rule(Parser *p)
         Token * _keyword;
         expr_ty z;
         if (
-            (_keyword = _PyPegen_expect_token(p, 661))  // token='if'
+            (_keyword = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (z = disjunction_rule(p))  // disjunction
         )
@@ -40827,7 +40940,7 @@ _tmp_260_rule(Parser *p)
         Token * _keyword;
         expr_ty z;
         if (
-            (_keyword = _PyPegen_expect_token(p, 661))  // token='if'
+            (_keyword = _PyPegen_expect_token(p, 663))  // token='if'
             &&
             (z = disjunction_rule(p))  // disjunction
         )
@@ -41500,7 +41613,7 @@ _tmp_274_rule(Parser *p)
         Token * _keyword;
         expr_ty name_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (name_var = _PyPegen_name_token(p))  // NAME
         )
@@ -41759,7 +41872,7 @@ _tmp_279_rule(Parser *p)
         Token * _keyword;
         expr_ty star_target_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (star_target_var = star_target_rule(p))  // star_target
         )
@@ -41800,7 +41913,7 @@ _tmp_280_rule(Parser *p)
         Token * _keyword;
         expr_ty star_target_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (star_target_var = star_target_rule(p))  // star_target
         )
@@ -41841,7 +41954,7 @@ _tmp_281_rule(Parser *p)
         Token * _keyword;
         expr_ty star_target_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (star_target_var = star_target_rule(p))  // star_target
         )
@@ -41882,7 +41995,7 @@ _tmp_282_rule(Parser *p)
         Token * _keyword;
         expr_ty star_target_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 659))  // token='as'
+            (_keyword = _PyPegen_expect_token(p, 661))  // token='as'
             &&
             (star_target_var = star_target_rule(p))  // star_target
         )
