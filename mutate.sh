@@ -12,6 +12,7 @@ replace_patterns() {
 
 # Change 'todo' to 'todo_'
 replace_patterns "Lib" "todo" "todo_"
+replace_patterns "Lib" "fn" "fn_"
 
 for dir in "Lib" "Programs" "Tools" "Modules"; do
     replace_patterns "$dir" "return" "bababooey"
@@ -22,6 +23,7 @@ for dir in "Lib" "Programs" "Tools" "Modules"; do
     replace_patterns "$dir" "except" "find_out"
     replace_patterns "$dir" "elif"   "else_if"
     replace_patterns "$dir" "for"    "each"
+    replace_patterns "$dir" "lambda" "fn"
 done
 
 # Make the mutated Python

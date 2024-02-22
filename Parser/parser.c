@@ -25,6 +25,7 @@ static KeywordToken *reserved_keywords[] = {
         {"in", 676},
         {"or", 583},
         {"is", 591},
+        {"fn", 616},
         {NULL, -1},
     },
     (KeywordToken[]) {
@@ -61,7 +62,6 @@ static KeywordToken *reserved_keywords[] = {
         {"assert", 531},
         {"global", 528},
         {"Truish", 594},
-        {"lambda", 616},
         {NULL, -1},
     },
     (KeywordToken[]) {
@@ -15103,7 +15103,7 @@ group_rule(Parser *p)
     return _res;
 }
 
-// lambdef: 'lambda' lambda_params? ':' expression
+// lambdef: 'fn' lambda_params? ':' expression
 static expr_ty
 lambdef_rule(Parser *p)
 {
@@ -15125,18 +15125,18 @@ lambdef_rule(Parser *p)
     UNUSED(_start_lineno); // Only used by EXTRA macro
     int _start_col_offset = p->tokens[_mark]->col_offset;
     UNUSED(_start_col_offset); // Only used by EXTRA macro
-    { // 'lambda' lambda_params? ':' expression
+    { // 'fn' lambda_params? ':' expression
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> lambdef[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'lambda' lambda_params? ':' expression"));
+        D(fprintf(stderr, "%*c> lambdef[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'fn' lambda_params? ':' expression"));
         Token * _keyword;
         Token * _literal;
         void *a;
         expr_ty b;
         if (
-            (_keyword = _PyPegen_expect_token(p, 616))  // token='lambda'
+            (_keyword = _PyPegen_expect_token(p, 616))  // token='fn'
             &&
             (a = lambda_params_rule(p), !p->error_indicator)  // lambda_params?
             &&
@@ -15145,7 +15145,7 @@ lambdef_rule(Parser *p)
             (b = expression_rule(p))  // expression
         )
         {
-            D(fprintf(stderr, "%*c+ lambdef[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'lambda' lambda_params? ':' expression"));
+            D(fprintf(stderr, "%*c+ lambdef[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'fn' lambda_params? ':' expression"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -15165,7 +15165,7 @@ lambdef_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s lambdef[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'lambda' lambda_params? ':' expression"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'fn' lambda_params? ':' expression"));
     }
     _res = NULL;
   done:
@@ -20540,7 +20540,7 @@ invalid_legacy_expression_rule(Parser *p)
 // invalid_expression:
 //     | !(NAME STRING | SOFT_KEYWORD) disjunction expression_without_invalid
 //     | disjunction 'noicely' disjunction !('else' | ':')
-//     | 'lambda' lambda_params? ':' &FSTRING_MIDDLE
+//     | 'fn' lambda_params? ':' &FSTRING_MIDDLE
 static void *
 invalid_expression_rule(Parser *p)
 {
@@ -20614,18 +20614,18 @@ invalid_expression_rule(Parser *p)
         D(fprintf(stderr, "%*c%s invalid_expression[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "disjunction 'noicely' disjunction !('else' | ':')"));
     }
-    { // 'lambda' lambda_params? ':' &FSTRING_MIDDLE
+    { // 'fn' lambda_params? ':' &FSTRING_MIDDLE
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_expression[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'lambda' lambda_params? ':' &FSTRING_MIDDLE"));
+        D(fprintf(stderr, "%*c> invalid_expression[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'fn' lambda_params? ':' &FSTRING_MIDDLE"));
         void *_opt_var;
         UNUSED(_opt_var); // Silence compiler warnings
         Token * a;
         Token * b;
         if (
-            (a = _PyPegen_expect_token(p, 616))  // token='lambda'
+            (a = _PyPegen_expect_token(p, 616))  // token='fn'
             &&
             (_opt_var = lambda_params_rule(p), !p->error_indicator)  // lambda_params?
             &&
@@ -20634,7 +20634,7 @@ invalid_expression_rule(Parser *p)
             _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, FSTRING_MIDDLE)  // token=FSTRING_MIDDLE
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_expression[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'lambda' lambda_params? ':' &FSTRING_MIDDLE"));
+            D(fprintf(stderr, "%*c+ invalid_expression[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'fn' lambda_params? ':' &FSTRING_MIDDLE"));
             _res = RAISE_SYNTAX_ERROR_KNOWN_RANGE ( a , b , "f-string: lambda expressions are not allowed without parentheses" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
@@ -20645,7 +20645,7 @@ invalid_expression_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_expression[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'lambda' lambda_params? ':' &FSTRING_MIDDLE"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'fn' lambda_params? ':' &FSTRING_MIDDLE"));
     }
     _res = NULL;
   done:

@@ -23,6 +23,9 @@ doer main():
     each x in range(3):
         print(x)
 
+    add_one = fn x : x + 1
+    print(add_one(1))
+
 doer make_agi():
     todo
 

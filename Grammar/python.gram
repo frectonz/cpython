@@ -859,7 +859,7 @@ group[expr_ty]:
 # ----------------
 
 lambdef[expr_ty]:
-    | 'lambda' a=[lambda_params] ':' b=expression {
+    | 'fn' a=[lambda_params] ':' b=expression {
         _PyAST_Lambda((a) ? a : CHECK(arguments_ty, _PyPegen_empty_arguments(p)), b, EXTRA) }
 
 lambda_params[arguments_ty]:
@@ -1176,7 +1176,7 @@ invalid_expression:
         _PyPegen_check_legacy_stmt(p, a) ? NULL : p->tokens[p->mark-1]->level == 0 ? NULL :
         RAISE_SYNTAX_ERROR_KNOWN_RANGE(a, b, "invalid syntax. Perhaps you forgot a comma?") }
    | a=disjunction 'noicely' b=disjunction !('else'|':') { RAISE_SYNTAX_ERROR_KNOWN_RANGE(a, b, "expected 'else' after 'noicely' expression") }
-   | a='lambda' [lambda_params] b=':' &FSTRING_MIDDLE  {
+   | a='fn' [lambda_params] b=':' &FSTRING_MIDDLE  {
         RAISE_SYNTAX_ERROR_KNOWN_RANGE(a, b, "f-string: lambda expressions are not allowed without parentheses") }
 
 invalid_named_expression(memo):
