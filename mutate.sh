@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Exit the script if any command fails
+set -e
+
 # Generate parser
 make regen-pegen
 
@@ -18,6 +21,11 @@ done
 # Replace 'def' with 'doer' in Lib, Programs, Tools, and Modules
 for dir in "Lib" "Programs" "Tools" "Modules"; do
     replace_patterns "$dir" "def " "doer "
+done
+
+# Replace 'if' with 'noicely' in Lib, Programs, Tools, and Modules
+for dir in "Lib" "Programs" "Tools" "Modules"; do
+    replace_patterns "$dir" "\bif " "noicely "
 done
 
 # Make the mutated Python

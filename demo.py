@@ -14,5 +14,5 @@ doer align_it():
 doer answer_to_life_the_universe_and_everything():
     bababooey 42
 
-if __name__ == "__main__":
+noicely __name__ == "__main__":
     main()
