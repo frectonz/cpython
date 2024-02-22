@@ -365,9 +365,9 @@ if_stmt[stmt_ty]:
     | 'noicely' a=named_expression ':' b=block c=[else_block] { _PyAST_If(a, b, c, EXTRA) }
 elif_stmt[stmt_ty]:
     | invalid_elif_stmt
-    | 'elif' a=named_expression ':' b=block c=elif_stmt {
+    | 'else_if' a=named_expression ':' b=block c=elif_stmt {
         _PyAST_If(a, b, CHECK(asdl_stmt_seq*, _PyPegen_singleton_seq(p, c)), EXTRA) }
-    | 'elif' a=named_expression ':' b=block c=[else_block] { _PyAST_If(a, b, c, EXTRA) }
+    | 'else_if' a=named_expression ':' b=block c=[else_block] { _PyAST_If(a, b, c, EXTRA) }
 else_block[asdl_stmt_seq*]:
     | invalid_else_stmt
     | 'else' &&':' b=block { b }
@@ -1305,7 +1305,7 @@ invalid_import_from_targets:
         RAISE_SYNTAX_ERROR("trailing comma not allowed without surrounding parentheses") }
 
 invalid_compound_stmt:
-    | a='elif' named_expression ':' { RAISE_SYNTAX_ERROR_STARTING_FROM(a, "'elif' must match an if-statement here") }
+    | a='else_if' named_expression ':' { RAISE_SYNTAX_ERROR_STARTING_FROM(a, "'else_if' must match an if-statement here") }
     | a='else' ':' { RAISE_SYNTAX_ERROR_STARTING_FROM(a, "'else' must match a valid statement here") }
 
 invalid_with_stmt:
@@ -1364,9 +1364,9 @@ invalid_if_stmt:
     | a='noicely' a=named_expression ':' NEWLINE !INDENT {
         RAISE_INDENTATION_ERROR("expected an indented block after 'noicely' statement on line %d", a->lineno) }
 invalid_elif_stmt:
-    | 'elif' named_expression NEWLINE { RAISE_SYNTAX_ERROR("expected ':'") }
-    | a='elif' named_expression ':' NEWLINE !INDENT {
-        RAISE_INDENTATION_ERROR("expected an indented block after 'elif' statement on line %d", a->lineno) }
+    | 'else_if' named_expression NEWLINE { RAISE_SYNTAX_ERROR("expected ':'") }
+    | a='else_if' named_expression ':' NEWLINE !INDENT {
+        RAISE_INDENTATION_ERROR("expected an indented block after 'else_if' statement on line %d", a->lineno) }
 invalid_else_stmt:
     | a='else' ':' NEWLINE !INDENT {
         RAISE_INDENTATION_ERROR("expected an indented block after 'else' statement on line %d", a->lineno) }

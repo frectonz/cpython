@@ -9,6 +9,7 @@ doer main():
     print(me)
 
     some_math()
+    goodbye_elif(2)
 
 doer make_agi():
     todo
@@ -31,6 +32,14 @@ doer some_math():
         print(10 / 0)
     find_out ZeroDivisionError:
         print("oh no")
+
+doer goodbye_elif(num):
+    noicely num == 1:
+        print("one")
+    else_if num == 2:
+        print("freed from the tyranny of elif")
+    else:
+        print("unknown num")
 
 noicely __name__ == "__main__":
     main()

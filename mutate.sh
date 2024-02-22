@@ -44,6 +44,11 @@ for dir in "Lib" "Programs" "Tools" "Modules"; do
     replace_patterns "$dir" "\bexcept:" "find_out:"
 done
 
+# Replace 'elif' with 'else_if' in Lib, Programs, Tools, and Modules
+for dir in "Lib" "Programs" "Tools" "Modules"; do
+    replace_patterns "$dir" "\belif " "else_if "
+done
+
 # Make the mutated Python
 make
 

@@ -41,7 +41,6 @@ static KeywordToken *reserved_keywords[] = {
         {"doer", 676},
         {"room", 678},
         {"with", 636},
-        {"elif", 665},
         {"else", 666},
         {"None", 616},
         {"True", 615},
@@ -66,6 +65,7 @@ static KeywordToken *reserved_keywords[] = {
     },
     (KeywordToken[]) {
         {"noicely", 663},
+        {"else_if", 665},
         {"finally", 654},
         {NULL, -1},
     },
@@ -6135,8 +6135,8 @@ if_stmt_rule(Parser *p)
 
 // elif_stmt:
 //     | invalid_elif_stmt
-//     | 'elif' named_expression ':' block elif_stmt
-//     | 'elif' named_expression ':' block else_block?
+//     | 'else_if' named_expression ':' block elif_stmt
+//     | 'else_if' named_expression ':' block else_block?
 static stmt_ty
 elif_stmt_rule(Parser *p)
 {
@@ -6177,19 +6177,19 @@ elif_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c%s elif_stmt[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "invalid_elif_stmt"));
     }
-    { // 'elif' named_expression ':' block elif_stmt
+    { // 'else_if' named_expression ':' block elif_stmt
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> elif_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'elif' named_expression ':' block elif_stmt"));
+        D(fprintf(stderr, "%*c> elif_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression ':' block elif_stmt"));
         Token * _keyword;
         Token * _literal;
         expr_ty a;
         asdl_stmt_seq* b;
         stmt_ty c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 665))  // token='elif'
+            (_keyword = _PyPegen_expect_token(p, 665))  // token='else_if'
             &&
             (a = named_expression_rule(p))  // named_expression
             &&
@@ -6200,7 +6200,7 @@ elif_stmt_rule(Parser *p)
             (c = elif_stmt_rule(p))  // elif_stmt
         )
         {
-            D(fprintf(stderr, "%*c+ elif_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'elif' named_expression ':' block elif_stmt"));
+            D(fprintf(stderr, "%*c+ elif_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression ':' block elif_stmt"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -6220,21 +6220,21 @@ elif_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s elif_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'elif' named_expression ':' block elif_stmt"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'else_if' named_expression ':' block elif_stmt"));
     }
-    { // 'elif' named_expression ':' block else_block?
+    { // 'else_if' named_expression ':' block else_block?
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> elif_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'elif' named_expression ':' block else_block?"));
+        D(fprintf(stderr, "%*c> elif_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression ':' block else_block?"));
         Token * _keyword;
         Token * _literal;
         expr_ty a;
         asdl_stmt_seq* b;
         void *c;
         if (
-            (_keyword = _PyPegen_expect_token(p, 665))  // token='elif'
+            (_keyword = _PyPegen_expect_token(p, 665))  // token='else_if'
             &&
             (a = named_expression_rule(p))  // named_expression
             &&
@@ -6245,7 +6245,7 @@ elif_stmt_rule(Parser *p)
             (c = else_block_rule(p), !p->error_indicator)  // else_block?
         )
         {
-            D(fprintf(stderr, "%*c+ elif_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'elif' named_expression ':' block else_block?"));
+            D(fprintf(stderr, "%*c+ elif_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression ':' block else_block?"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -6265,7 +6265,7 @@ elif_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s elif_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'elif' named_expression ':' block else_block?"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'else_if' named_expression ':' block else_block?"));
     }
     _res = NULL;
   done:
@@ -22721,7 +22721,7 @@ invalid_import_from_targets_rule(Parser *p)
     return _res;
 }
 
-// invalid_compound_stmt: 'elif' named_expression ':' | 'else' ':'
+// invalid_compound_stmt: 'else_if' named_expression ':' | 'else' ':'
 static void *
 invalid_compound_stmt_rule(Parser *p)
 {
@@ -22734,25 +22734,25 @@ invalid_compound_stmt_rule(Parser *p)
     }
     void * _res = NULL;
     int _mark = p->mark;
-    { // 'elif' named_expression ':'
+    { // 'else_if' named_expression ':'
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_compound_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'elif' named_expression ':'"));
+        D(fprintf(stderr, "%*c> invalid_compound_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression ':'"));
         Token * _literal;
         Token * a;
         expr_ty named_expression_var;
         if (
-            (a = _PyPegen_expect_token(p, 665))  // token='elif'
+            (a = _PyPegen_expect_token(p, 665))  // token='else_if'
             &&
             (named_expression_var = named_expression_rule(p))  // named_expression
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_compound_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'elif' named_expression ':'"));
-            _res = RAISE_SYNTAX_ERROR_STARTING_FROM ( a , "'elif' must match an if-statement here" );
+            D(fprintf(stderr, "%*c+ invalid_compound_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression ':'"));
+            _res = RAISE_SYNTAX_ERROR_STARTING_FROM ( a , "'else_if' must match an if-statement here" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 p->level--;
@@ -22762,7 +22762,7 @@ invalid_compound_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_compound_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'elif' named_expression ':'"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'else_if' named_expression ':'"));
     }
     { // 'else' ':'
         if (p->error_indicator) {
@@ -24002,8 +24002,8 @@ invalid_if_stmt_rule(Parser *p)
 }
 
 // invalid_elif_stmt:
-//     | 'elif' named_expression NEWLINE
-//     | 'elif' named_expression ':' NEWLINE !INDENT
+//     | 'else_if' named_expression NEWLINE
+//     | 'else_if' named_expression ':' NEWLINE !INDENT
 static void *
 invalid_elif_stmt_rule(Parser *p)
 {
@@ -24016,24 +24016,24 @@ invalid_elif_stmt_rule(Parser *p)
     }
     void * _res = NULL;
     int _mark = p->mark;
-    { // 'elif' named_expression NEWLINE
+    { // 'else_if' named_expression NEWLINE
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_elif_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'elif' named_expression NEWLINE"));
+        D(fprintf(stderr, "%*c> invalid_elif_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression NEWLINE"));
         Token * _keyword;
         expr_ty named_expression_var;
         Token * newline_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 665))  // token='elif'
+            (_keyword = _PyPegen_expect_token(p, 665))  // token='else_if'
             &&
             (named_expression_var = named_expression_rule(p))  // named_expression
             &&
             (newline_var = _PyPegen_expect_token(p, NEWLINE))  // token='NEWLINE'
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_elif_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'elif' named_expression NEWLINE"));
+            D(fprintf(stderr, "%*c+ invalid_elif_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression NEWLINE"));
             _res = RAISE_SYNTAX_ERROR ( "expected ':'" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
@@ -24044,20 +24044,20 @@ invalid_elif_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_elif_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'elif' named_expression NEWLINE"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'else_if' named_expression NEWLINE"));
     }
-    { // 'elif' named_expression ':' NEWLINE !INDENT
+    { // 'else_if' named_expression ':' NEWLINE !INDENT
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_elif_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'elif' named_expression ':' NEWLINE !INDENT"));
+        D(fprintf(stderr, "%*c> invalid_elif_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression ':' NEWLINE !INDENT"));
         Token * _literal;
         Token * a;
         expr_ty named_expression_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 665))  // token='elif'
+            (a = _PyPegen_expect_token(p, 665))  // token='else_if'
             &&
             (named_expression_var = named_expression_rule(p))  // named_expression
             &&
@@ -24068,8 +24068,8 @@ invalid_elif_stmt_rule(Parser *p)
             _PyPegen_lookahead_with_int(0, _PyPegen_expect_token, p, INDENT)  // token=INDENT
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_elif_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'elif' named_expression ':' NEWLINE !INDENT"));
-            _res = RAISE_INDENTATION_ERROR ( "expected an indented block after 'elif' statement on line %d" , a -> lineno );
+            D(fprintf(stderr, "%*c+ invalid_elif_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'else_if' named_expression ':' NEWLINE !INDENT"));
+            _res = RAISE_INDENTATION_ERROR ( "expected an indented block after 'else_if' statement on line %d" , a -> lineno );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 p->level--;
@@ -24079,7 +24079,7 @@ invalid_elif_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_elif_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'elif' named_expression ':' NEWLINE !INDENT"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'else_if' named_expression ':' NEWLINE !INDENT"));
     }
     _res = NULL;
   done:
