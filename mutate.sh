@@ -21,6 +21,7 @@ for dir in "Lib" "Programs" "Tools" "Modules"; do
     replace_patterns "$dir" "try"    "fuck_around"
     replace_patterns "$dir" "except" "find_out"
     replace_patterns "$dir" "elif"   "else_if"
+    replace_patterns "$dir" "for"    "each"
 done
 
 # Make the mutated Python
