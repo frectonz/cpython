@@ -17,6 +17,9 @@ doer main():
     noicely not Falsish:
         print("falsish")
 
+    each x in range(3):
+        print(x)
+
 doer make_agi():
     todo
 
