@@ -130,7 +130,7 @@ compound_stmt[stmt_ty]:
     | invalid_compound_stmt
     | &('doer' | '@' | 'async') function_def
     | &'noicely' if_stmt
-    | &('class' | '@') class_def
+    | &('room' | '@') class_def
     | &('with' | 'async') with_stmt
     | &('for' | 'async') for_stmt
     | &'try' try_stmt
@@ -254,7 +254,7 @@ class_def[stmt_ty]:
 
 class_def_raw[stmt_ty]:
     | invalid_class_def_raw
-    | 'class' a=NAME t=[type_params] b=['(' z=[arguments] ')' { z }] ':' c=block {
+    | 'room' a=NAME t=[type_params] b=['(' z=[arguments] ')' { z }] ':' c=block {
         _PyAST_ClassDef(a->v.Name.id,
                      (b) ? ((expr_ty) b)->v.Call.args : NULL,
                      (b) ? ((expr_ty) b)->v.Call.keywords : NULL,
@@ -1382,8 +1382,8 @@ invalid_def_raw:
     | ['async'] a='doer' NAME [type_params] '(' [params] ')' ['->' expression] ':' NEWLINE !INDENT {
         RAISE_INDENTATION_ERROR("expected an indented block after function definition on line %d", a->lineno) }
 invalid_class_def_raw:
-    | 'class' NAME [type_params] ['(' [arguments] ')'] NEWLINE { RAISE_SYNTAX_ERROR("expected ':'") }
-    | a='class' NAME [type_params] ['(' [arguments] ')'] ':' NEWLINE !INDENT {
+    | 'room' NAME [type_params] ['(' [arguments] ')'] NEWLINE { RAISE_SYNTAX_ERROR("expected ':'") }
+    | a='room' NAME [type_params] ['(' [arguments] ')'] ':' NEWLINE !INDENT {
         RAISE_INDENTATION_ERROR("expected an indented block after class definition on line %d", a->lineno) }
 
 invalid_double_starred_kvpairs:

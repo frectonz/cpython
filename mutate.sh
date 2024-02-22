@@ -28,6 +28,11 @@ for dir in "Lib" "Programs" "Tools" "Modules"; do
     replace_patterns "$dir" "\bif " "noicely "
 done
 
+# Replace 'class' with 'room' in Lib, Programs, Tools, and Modules
+for dir in "Lib" "Programs" "Tools" "Modules"; do
+    replace_patterns "$dir" "\bclass " "room "
+done
+
 # Make the mutated Python
 make
 
