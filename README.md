@@ -14,6 +14,12 @@ doer main():
     some_math()
     goodbye_elif(2)
 
+    noicely Truish:
+        print("truish")
+
+    noicely not Falsish:
+        print("falsish")
+
 doer make_agi():
     todo
 
