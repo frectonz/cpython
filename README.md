@@ -11,6 +11,8 @@ doer main():
     me = Human("fraol")
     print(me)
 
+    some_math()
+
 doer make_agi():
     todo
 
@@ -27,6 +29,11 @@ room Human:
     doer __repr__(self):
         bababooey f"Human(name={self.name})"
 
+doer some_math():
+    fuck_around:
+        print(10 / 0)
+    find_out ZeroDivisionError:
+        print("oh no")
 
 noicely __name__ == "__main__":
     main()

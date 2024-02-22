@@ -30,7 +30,6 @@ static KeywordToken *reserved_keywords[] = {
     (KeywordToken[]) {
         {"del", 618},
         {"for", 673},
-        {"try", 645},
         {"and", 584},
         {"not", 590},
         {NULL, -1},
@@ -62,7 +61,6 @@ static KeywordToken *reserved_keywords[] = {
         {"import", 622},
         {"assert", 531},
         {"global", 528},
-        {"except", 658},
         {"lambda", 614},
         {NULL, -1},
     },
@@ -74,6 +72,7 @@ static KeywordToken *reserved_keywords[] = {
     (KeywordToken[]) {
         {"continue", 511},
         {"nonlocal", 529},
+        {"find_out", 658},
         {NULL, -1},
     },
     (KeywordToken[]) {
@@ -81,7 +80,10 @@ static KeywordToken *reserved_keywords[] = {
         {NULL, -1},
     },
     (KeywordToken[]) {{NULL, -1}},
-    (KeywordToken[]) {{NULL, -1}},
+    (KeywordToken[]) {
+        {"fuck_around", 645},
+        {NULL, -1},
+    },
     (KeywordToken[]) {{NULL, -1}},
     (KeywordToken[]) {
         {"unimplemented", 506},
@@ -2171,7 +2173,7 @@ simple_stmt_rule(Parser *p)
 //     | &('room' | '@') class_def
 //     | &('with' | 'async') with_stmt
 //     | &('for' | 'async') for_stmt
-//     | &'try' try_stmt
+//     | &'fuck_around' try_stmt
 //     | &'while' while_stmt
 //     | match_stmt
 static stmt_ty
@@ -2310,26 +2312,26 @@ compound_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c%s compound_stmt[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "&('for' | 'async') for_stmt"));
     }
-    { // &'try' try_stmt
+    { // &'fuck_around' try_stmt
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> compound_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'try' try_stmt"));
+        D(fprintf(stderr, "%*c> compound_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "&'fuck_around' try_stmt"));
         stmt_ty try_stmt_var;
         if (
-            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 645)  // token='try'
+            _PyPegen_lookahead_with_int(1, _PyPegen_expect_token, p, 645)  // token='fuck_around'
             &&
             (try_stmt_var = try_stmt_rule(p))  // try_stmt
         )
         {
-            D(fprintf(stderr, "%*c+ compound_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "&'try' try_stmt"));
+            D(fprintf(stderr, "%*c+ compound_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "&'fuck_around' try_stmt"));
             _res = try_stmt_var;
             goto done;
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s compound_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "&'try' try_stmt"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "&'fuck_around' try_stmt"));
     }
     { // &'while' while_stmt
         if (p->error_indicator) {
@@ -7000,9 +7002,9 @@ with_item_rule(Parser *p)
 
 // try_stmt:
 //     | invalid_try_stmt
-//     | 'try' &&':' block finally_block
-//     | 'try' &&':' block except_block+ else_block? finally_block?
-//     | 'try' &&':' block except_star_block+ else_block? finally_block?
+//     | 'fuck_around' &&':' block finally_block
+//     | 'fuck_around' &&':' block except_block+ else_block? finally_block?
+//     | 'fuck_around' &&':' block except_star_block+ else_block? finally_block?
 static stmt_ty
 try_stmt_rule(Parser *p)
 {
@@ -7043,18 +7045,18 @@ try_stmt_rule(Parser *p)
         D(fprintf(stderr, "%*c%s try_stmt[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "invalid_try_stmt"));
     }
-    { // 'try' &&':' block finally_block
+    { // 'fuck_around' &&':' block finally_block
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'try' &&':' block finally_block"));
+        D(fprintf(stderr, "%*c> try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'fuck_around' &&':' block finally_block"));
         Token * _keyword;
         Token * _literal;
         asdl_stmt_seq* b;
         asdl_stmt_seq* f;
         if (
-            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='fuck_around'
             &&
             (_literal = _PyPegen_expect_forced_token(p, 11, ":"))  // forced_token=':'
             &&
@@ -7063,7 +7065,7 @@ try_stmt_rule(Parser *p)
             (f = finally_block_rule(p))  // finally_block
         )
         {
-            D(fprintf(stderr, "%*c+ try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'try' &&':' block finally_block"));
+            D(fprintf(stderr, "%*c+ try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'fuck_around' &&':' block finally_block"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -7083,14 +7085,14 @@ try_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s try_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'try' &&':' block finally_block"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'fuck_around' &&':' block finally_block"));
     }
-    { // 'try' &&':' block except_block+ else_block? finally_block?
+    { // 'fuck_around' &&':' block except_block+ else_block? finally_block?
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'try' &&':' block except_block+ else_block? finally_block?"));
+        D(fprintf(stderr, "%*c> try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'fuck_around' &&':' block except_block+ else_block? finally_block?"));
         Token * _keyword;
         Token * _literal;
         asdl_stmt_seq* b;
@@ -7098,7 +7100,7 @@ try_stmt_rule(Parser *p)
         asdl_excepthandler_seq* ex;
         void *f;
         if (
-            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='fuck_around'
             &&
             (_literal = _PyPegen_expect_forced_token(p, 11, ":"))  // forced_token=':'
             &&
@@ -7111,7 +7113,7 @@ try_stmt_rule(Parser *p)
             (f = finally_block_rule(p), !p->error_indicator)  // finally_block?
         )
         {
-            D(fprintf(stderr, "%*c+ try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'try' &&':' block except_block+ else_block? finally_block?"));
+            D(fprintf(stderr, "%*c+ try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'fuck_around' &&':' block except_block+ else_block? finally_block?"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -7131,14 +7133,14 @@ try_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s try_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'try' &&':' block except_block+ else_block? finally_block?"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'fuck_around' &&':' block except_block+ else_block? finally_block?"));
     }
-    { // 'try' &&':' block except_star_block+ else_block? finally_block?
+    { // 'fuck_around' &&':' block except_star_block+ else_block? finally_block?
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'try' &&':' block except_star_block+ else_block? finally_block?"));
+        D(fprintf(stderr, "%*c> try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'fuck_around' &&':' block except_star_block+ else_block? finally_block?"));
         Token * _keyword;
         Token * _literal;
         asdl_stmt_seq* b;
@@ -7146,7 +7148,7 @@ try_stmt_rule(Parser *p)
         asdl_excepthandler_seq* ex;
         void *f;
         if (
-            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='fuck_around'
             &&
             (_literal = _PyPegen_expect_forced_token(p, 11, ":"))  // forced_token=':'
             &&
@@ -7159,7 +7161,7 @@ try_stmt_rule(Parser *p)
             (f = finally_block_rule(p), !p->error_indicator)  // finally_block?
         )
         {
-            D(fprintf(stderr, "%*c+ try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'try' &&':' block except_star_block+ else_block? finally_block?"));
+            D(fprintf(stderr, "%*c+ try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'fuck_around' &&':' block except_star_block+ else_block? finally_block?"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -7179,7 +7181,7 @@ try_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s try_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'try' &&':' block except_star_block+ else_block? finally_block?"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'fuck_around' &&':' block except_star_block+ else_block? finally_block?"));
     }
     _res = NULL;
   done:
@@ -7189,8 +7191,8 @@ try_stmt_rule(Parser *p)
 
 // except_block:
 //     | invalid_except_stmt_indent
-//     | 'except' expression ['as' NAME] ':' block
-//     | 'except' ':' block
+//     | 'find_out' expression ['as' NAME] ':' block
+//     | 'find_out' ':' block
 //     | invalid_except_stmt
 static excepthandler_ty
 except_block_rule(Parser *p)
@@ -7232,19 +7234,19 @@ except_block_rule(Parser *p)
         D(fprintf(stderr, "%*c%s except_block[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "invalid_except_stmt_indent"));
     }
-    { // 'except' expression ['as' NAME] ':' block
+    { // 'find_out' expression ['as' NAME] ':' block
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> except_block[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' expression ['as' NAME] ':' block"));
+        D(fprintf(stderr, "%*c> except_block[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' expression ['as' NAME] ':' block"));
         Token * _keyword;
         Token * _literal;
         asdl_stmt_seq* b;
         expr_ty e;
         void *t;
         if (
-            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (e = expression_rule(p))  // expression
             &&
@@ -7255,7 +7257,7 @@ except_block_rule(Parser *p)
             (b = block_rule(p))  // block
         )
         {
-            D(fprintf(stderr, "%*c+ except_block[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' expression ['as' NAME] ':' block"));
+            D(fprintf(stderr, "%*c+ except_block[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' expression ['as' NAME] ':' block"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -7275,26 +7277,26 @@ except_block_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s except_block[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' expression ['as' NAME] ':' block"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' expression ['as' NAME] ':' block"));
     }
-    { // 'except' ':' block
+    { // 'find_out' ':' block
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> except_block[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' ':' block"));
+        D(fprintf(stderr, "%*c> except_block[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' ':' block"));
         Token * _keyword;
         Token * _literal;
         asdl_stmt_seq* b;
         if (
-            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
             (b = block_rule(p))  // block
         )
         {
-            D(fprintf(stderr, "%*c+ except_block[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' ':' block"));
+            D(fprintf(stderr, "%*c+ except_block[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' ':' block"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -7314,7 +7316,7 @@ except_block_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s except_block[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' ':' block"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' ':' block"));
     }
     if (p->call_invalid_rules) { // invalid_except_stmt
         if (p->error_indicator) {
@@ -7343,7 +7345,7 @@ except_block_rule(Parser *p)
 
 // except_star_block:
 //     | invalid_except_star_stmt_indent
-//     | 'except' '*' expression ['as' NAME] ':' block
+//     | 'find_out' '*' expression ['as' NAME] ':' block
 //     | invalid_except_stmt
 static excepthandler_ty
 except_star_block_rule(Parser *p)
@@ -7385,12 +7387,12 @@ except_star_block_rule(Parser *p)
         D(fprintf(stderr, "%*c%s except_star_block[%d-%d]: %s failed!\n", p->level, ' ',
                   p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "invalid_except_star_stmt_indent"));
     }
-    { // 'except' '*' expression ['as' NAME] ':' block
+    { // 'find_out' '*' expression ['as' NAME] ':' block
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> except_star_block[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' '*' expression ['as' NAME] ':' block"));
+        D(fprintf(stderr, "%*c> except_star_block[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' '*' expression ['as' NAME] ':' block"));
         Token * _keyword;
         Token * _literal;
         Token * _literal_1;
@@ -7398,7 +7400,7 @@ except_star_block_rule(Parser *p)
         expr_ty e;
         void *t;
         if (
-            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (_literal = _PyPegen_expect_token(p, 16))  // token='*'
             &&
@@ -7411,7 +7413,7 @@ except_star_block_rule(Parser *p)
             (b = block_rule(p))  // block
         )
         {
-            D(fprintf(stderr, "%*c+ except_star_block[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' '*' expression ['as' NAME] ':' block"));
+            D(fprintf(stderr, "%*c+ except_star_block[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' '*' expression ['as' NAME] ':' block"));
             Token *_token = _PyPegen_get_last_nonnwhitespace_token(p);
             if (_token == NULL) {
                 p->level--;
@@ -7431,7 +7433,7 @@ except_star_block_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s except_star_block[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' '*' expression ['as' NAME] ':' block"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' '*' expression ['as' NAME] ':' block"));
     }
     if (p->call_invalid_rules) { // invalid_except_stmt
         if (p->error_indicator) {
@@ -23004,10 +23006,10 @@ invalid_with_stmt_indent_rule(Parser *p)
 }
 
 // invalid_try_stmt:
-//     | 'try' ':' NEWLINE !INDENT
-//     | 'try' ':' block !('except' | 'finally')
-//     | 'try' ':' block* except_block+ 'except' '*' expression ['as' NAME] ':'
-//     | 'try' ':' block* except_star_block+ 'except' [expression ['as' NAME]] ':'
+//     | 'fuck_around' ':' NEWLINE !INDENT
+//     | 'fuck_around' ':' block !('find_out' | 'finally')
+//     | 'fuck_around' ':' block* except_block+ 'find_out' '*' expression ['as' NAME] ':'
+//     | 'fuck_around' ':' block* except_star_block+ 'find_out' [expression ['as' NAME]] ':'
 static void *
 invalid_try_stmt_rule(Parser *p)
 {
@@ -23020,17 +23022,17 @@ invalid_try_stmt_rule(Parser *p)
     }
     void * _res = NULL;
     int _mark = p->mark;
-    { // 'try' ':' NEWLINE !INDENT
+    { // 'fuck_around' ':' NEWLINE !INDENT
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'try' ':' NEWLINE !INDENT"));
+        D(fprintf(stderr, "%*c> invalid_try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'fuck_around' ':' NEWLINE !INDENT"));
         Token * _literal;
         Token * a;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 645))  // token='try'
+            (a = _PyPegen_expect_token(p, 645))  // token='fuck_around'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -23039,8 +23041,8 @@ invalid_try_stmt_rule(Parser *p)
             _PyPegen_lookahead_with_int(0, _PyPegen_expect_token, p, INDENT)  // token=INDENT
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'try' ':' NEWLINE !INDENT"));
-            _res = RAISE_INDENTATION_ERROR ( "expected an indented block after 'try' statement on line %d" , a -> lineno );
+            D(fprintf(stderr, "%*c+ invalid_try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'fuck_around' ':' NEWLINE !INDENT"));
+            _res = RAISE_INDENTATION_ERROR ( "expected an indented block after 'fuck_around' statement on line %d" , a -> lineno );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 p->level--;
@@ -23050,19 +23052,19 @@ invalid_try_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_try_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'try' ':' NEWLINE !INDENT"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'fuck_around' ':' NEWLINE !INDENT"));
     }
-    { // 'try' ':' block !('except' | 'finally')
+    { // 'fuck_around' ':' block !('find_out' | 'finally')
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'try' ':' block !('except' | 'finally')"));
+        D(fprintf(stderr, "%*c> invalid_try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'fuck_around' ':' block !('find_out' | 'finally')"));
         Token * _keyword;
         Token * _literal;
         asdl_stmt_seq* block_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='fuck_around'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -23071,8 +23073,8 @@ invalid_try_stmt_rule(Parser *p)
             _PyPegen_lookahead(0, _tmp_214_rule, p)
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'try' ':' block !('except' | 'finally')"));
-            _res = RAISE_SYNTAX_ERROR ( "expected 'except' or 'finally' block" );
+            D(fprintf(stderr, "%*c+ invalid_try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'fuck_around' ':' block !('find_out' | 'finally')"));
+            _res = RAISE_SYNTAX_ERROR ( "expected 'find_out' or 'finally' block" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 p->level--;
@@ -23082,14 +23084,14 @@ invalid_try_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_try_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'try' ':' block !('except' | 'finally')"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'fuck_around' ':' block !('find_out' | 'finally')"));
     }
-    { // 'try' ':' block* except_block+ 'except' '*' expression ['as' NAME] ':'
+    { // 'fuck_around' ':' block* except_block+ 'find_out' '*' expression ['as' NAME] ':'
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'try' ':' block* except_block+ 'except' '*' expression ['as' NAME] ':'"));
+        D(fprintf(stderr, "%*c> invalid_try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'fuck_around' ':' block* except_block+ 'find_out' '*' expression ['as' NAME] ':'"));
         Token * _keyword;
         Token * _literal;
         Token * _literal_1;
@@ -23101,7 +23103,7 @@ invalid_try_stmt_rule(Parser *p)
         Token * b;
         expr_ty expression_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='fuck_around'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -23109,7 +23111,7 @@ invalid_try_stmt_rule(Parser *p)
             &&
             (_loop1_216_var = _loop1_216_rule(p))  // except_block+
             &&
-            (a = _PyPegen_expect_token(p, 658))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (b = _PyPegen_expect_token(p, 16))  // token='*'
             &&
@@ -23120,8 +23122,8 @@ invalid_try_stmt_rule(Parser *p)
             (_literal_1 = _PyPegen_expect_token(p, 11))  // token=':'
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'try' ':' block* except_block+ 'except' '*' expression ['as' NAME] ':'"));
-            _res = RAISE_SYNTAX_ERROR_KNOWN_RANGE ( a , b , "cannot have both 'except' and 'except*' on the same 'try'" );
+            D(fprintf(stderr, "%*c+ invalid_try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'fuck_around' ':' block* except_block+ 'find_out' '*' expression ['as' NAME] ':'"));
+            _res = RAISE_SYNTAX_ERROR_KNOWN_RANGE ( a , b , "cannot have both 'find_out' and 'except*' on the same 'fuck_around'" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 p->level--;
@@ -23131,14 +23133,14 @@ invalid_try_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_try_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'try' ':' block* except_block+ 'except' '*' expression ['as' NAME] ':'"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'fuck_around' ':' block* except_block+ 'find_out' '*' expression ['as' NAME] ':'"));
     }
-    { // 'try' ':' block* except_star_block+ 'except' [expression ['as' NAME]] ':'
+    { // 'fuck_around' ':' block* except_star_block+ 'find_out' [expression ['as' NAME]] ':'
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'try' ':' block* except_star_block+ 'except' [expression ['as' NAME]] ':'"));
+        D(fprintf(stderr, "%*c> invalid_try_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'fuck_around' ':' block* except_star_block+ 'find_out' [expression ['as' NAME]] ':'"));
         Token * _keyword;
         Token * _literal;
         Token * _literal_1;
@@ -23148,7 +23150,7 @@ invalid_try_stmt_rule(Parser *p)
         UNUSED(_opt_var); // Silence compiler warnings
         Token * a;
         if (
-            (_keyword = _PyPegen_expect_token(p, 645))  // token='try'
+            (_keyword = _PyPegen_expect_token(p, 645))  // token='fuck_around'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -23156,15 +23158,15 @@ invalid_try_stmt_rule(Parser *p)
             &&
             (_loop1_219_var = _loop1_219_rule(p))  // except_star_block+
             &&
-            (a = _PyPegen_expect_token(p, 658))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (_opt_var = _tmp_220_rule(p), !p->error_indicator)  // [expression ['as' NAME]]
             &&
             (_literal_1 = _PyPegen_expect_token(p, 11))  // token=':'
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'try' ':' block* except_star_block+ 'except' [expression ['as' NAME]] ':'"));
-            _res = RAISE_SYNTAX_ERROR_KNOWN_LOCATION ( a , "cannot have both 'except' and 'except*' on the same 'try'" );
+            D(fprintf(stderr, "%*c+ invalid_try_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'fuck_around' ':' block* except_star_block+ 'find_out' [expression ['as' NAME]] ':'"));
+            _res = RAISE_SYNTAX_ERROR_KNOWN_LOCATION ( a , "cannot have both 'find_out' and 'except*' on the same 'fuck_around'" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 p->level--;
@@ -23174,7 +23176,7 @@ invalid_try_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_try_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'try' ':' block* except_star_block+ 'except' [expression ['as' NAME]] ':'"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'fuck_around' ':' block* except_star_block+ 'find_out' [expression ['as' NAME]] ':'"));
     }
     _res = NULL;
   done:
@@ -23183,10 +23185,10 @@ invalid_try_stmt_rule(Parser *p)
 }
 
 // invalid_except_stmt:
-//     | 'except' '*'? expression ',' expressions ['as' NAME] ':'
-//     | 'except' '*'? expression ['as' NAME] NEWLINE
-//     | 'except' NEWLINE
-//     | 'except' '*' (NEWLINE | ':')
+//     | 'find_out' '*'? expression ',' expressions ['as' NAME] ':'
+//     | 'find_out' '*'? expression ['as' NAME] NEWLINE
+//     | 'find_out' NEWLINE
+//     | 'find_out' '*' (NEWLINE | ':')
 static void *
 invalid_except_stmt_rule(Parser *p)
 {
@@ -23199,12 +23201,12 @@ invalid_except_stmt_rule(Parser *p)
     }
     void * _res = NULL;
     int _mark = p->mark;
-    { // 'except' '*'? expression ',' expressions ['as' NAME] ':'
+    { // 'find_out' '*'? expression ',' expressions ['as' NAME] ':'
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_except_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' '*'? expression ',' expressions ['as' NAME] ':'"));
+        D(fprintf(stderr, "%*c> invalid_except_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' '*'? expression ',' expressions ['as' NAME] ':'"));
         Token * _keyword;
         Token * _literal;
         Token * _literal_1;
@@ -23215,7 +23217,7 @@ invalid_except_stmt_rule(Parser *p)
         expr_ty a;
         expr_ty expressions_var;
         if (
-            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (_opt_var = _PyPegen_expect_token(p, 16), !p->error_indicator)  // '*'?
             &&
@@ -23230,7 +23232,7 @@ invalid_except_stmt_rule(Parser *p)
             (_literal_1 = _PyPegen_expect_token(p, 11))  // token=':'
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_except_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' '*'? expression ',' expressions ['as' NAME] ':'"));
+            D(fprintf(stderr, "%*c+ invalid_except_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' '*'? expression ',' expressions ['as' NAME] ':'"));
             _res = RAISE_SYNTAX_ERROR_STARTING_FROM ( a , "multiple exception types must be parenthesized" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
@@ -23241,14 +23243,14 @@ invalid_except_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_except_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' '*'? expression ',' expressions ['as' NAME] ':'"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' '*'? expression ',' expressions ['as' NAME] ':'"));
     }
-    { // 'except' '*'? expression ['as' NAME] NEWLINE
+    { // 'find_out' '*'? expression ['as' NAME] NEWLINE
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_except_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' '*'? expression ['as' NAME] NEWLINE"));
+        D(fprintf(stderr, "%*c> invalid_except_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' '*'? expression ['as' NAME] NEWLINE"));
         void *_opt_var;
         UNUSED(_opt_var); // Silence compiler warnings
         void *_opt_var_1;
@@ -23257,7 +23259,7 @@ invalid_except_stmt_rule(Parser *p)
         expr_ty expression_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 658))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (_opt_var = _PyPegen_expect_token(p, 16), !p->error_indicator)  // '*'?
             &&
@@ -23268,7 +23270,7 @@ invalid_except_stmt_rule(Parser *p)
             (newline_var = _PyPegen_expect_token(p, NEWLINE))  // token='NEWLINE'
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_except_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' '*'? expression ['as' NAME] NEWLINE"));
+            D(fprintf(stderr, "%*c+ invalid_except_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' '*'? expression ['as' NAME] NEWLINE"));
             _res = RAISE_SYNTAX_ERROR ( "expected ':'" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
@@ -23279,23 +23281,23 @@ invalid_except_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_except_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' '*'? expression ['as' NAME] NEWLINE"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' '*'? expression ['as' NAME] NEWLINE"));
     }
-    { // 'except' NEWLINE
+    { // 'find_out' NEWLINE
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_except_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' NEWLINE"));
+        D(fprintf(stderr, "%*c> invalid_except_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' NEWLINE"));
         Token * a;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 658))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (newline_var = _PyPegen_expect_token(p, NEWLINE))  // token='NEWLINE'
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_except_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' NEWLINE"));
+            D(fprintf(stderr, "%*c+ invalid_except_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' NEWLINE"));
             _res = RAISE_SYNTAX_ERROR ( "expected ':'" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
@@ -23306,26 +23308,26 @@ invalid_except_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_except_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' NEWLINE"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' NEWLINE"));
     }
-    { // 'except' '*' (NEWLINE | ':')
+    { // 'find_out' '*' (NEWLINE | ':')
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_except_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' '*' (NEWLINE | ':')"));
+        D(fprintf(stderr, "%*c> invalid_except_stmt[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' '*' (NEWLINE | ':')"));
         Token * _literal;
         void *_tmp_223_var;
         Token * a;
         if (
-            (a = _PyPegen_expect_token(p, 658))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (_literal = _PyPegen_expect_token(p, 16))  // token='*'
             &&
             (_tmp_223_var = _tmp_223_rule(p))  // NEWLINE | ':'
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_except_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' '*' (NEWLINE | ':')"));
+            D(fprintf(stderr, "%*c+ invalid_except_stmt[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' '*' (NEWLINE | ':')"));
             _res = RAISE_SYNTAX_ERROR ( "expected one or more exception types" );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
@@ -23336,7 +23338,7 @@ invalid_except_stmt_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_except_stmt[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' '*' (NEWLINE | ':')"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' '*' (NEWLINE | ':')"));
     }
     _res = NULL;
   done:
@@ -23396,8 +23398,8 @@ invalid_finally_stmt_rule(Parser *p)
 }
 
 // invalid_except_stmt_indent:
-//     | 'except' expression ['as' NAME] ':' NEWLINE !INDENT
-//     | 'except' ':' NEWLINE !INDENT
+//     | 'find_out' expression ['as' NAME] ':' NEWLINE !INDENT
+//     | 'find_out' ':' NEWLINE !INDENT
 static void *
 invalid_except_stmt_indent_rule(Parser *p)
 {
@@ -23410,12 +23412,12 @@ invalid_except_stmt_indent_rule(Parser *p)
     }
     void * _res = NULL;
     int _mark = p->mark;
-    { // 'except' expression ['as' NAME] ':' NEWLINE !INDENT
+    { // 'find_out' expression ['as' NAME] ':' NEWLINE !INDENT
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_except_stmt_indent[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' expression ['as' NAME] ':' NEWLINE !INDENT"));
+        D(fprintf(stderr, "%*c> invalid_except_stmt_indent[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' expression ['as' NAME] ':' NEWLINE !INDENT"));
         Token * _literal;
         void *_opt_var;
         UNUSED(_opt_var); // Silence compiler warnings
@@ -23423,7 +23425,7 @@ invalid_except_stmt_indent_rule(Parser *p)
         expr_ty expression_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 658))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (expression_var = expression_rule(p))  // expression
             &&
@@ -23436,8 +23438,8 @@ invalid_except_stmt_indent_rule(Parser *p)
             _PyPegen_lookahead_with_int(0, _PyPegen_expect_token, p, INDENT)  // token=INDENT
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_except_stmt_indent[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' expression ['as' NAME] ':' NEWLINE !INDENT"));
-            _res = RAISE_INDENTATION_ERROR ( "expected an indented block after 'except' statement on line %d" , a -> lineno );
+            D(fprintf(stderr, "%*c+ invalid_except_stmt_indent[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' expression ['as' NAME] ':' NEWLINE !INDENT"));
+            _res = RAISE_INDENTATION_ERROR ( "expected an indented block after 'find_out' statement on line %d" , a -> lineno );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 p->level--;
@@ -23447,19 +23449,19 @@ invalid_except_stmt_indent_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_except_stmt_indent[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' expression ['as' NAME] ':' NEWLINE !INDENT"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' expression ['as' NAME] ':' NEWLINE !INDENT"));
     }
-    { // 'except' ':' NEWLINE !INDENT
+    { // 'find_out' ':' NEWLINE !INDENT
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_except_stmt_indent[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' ':' NEWLINE !INDENT"));
+        D(fprintf(stderr, "%*c> invalid_except_stmt_indent[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' ':' NEWLINE !INDENT"));
         Token * _literal;
         Token * a;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 658))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (_literal = _PyPegen_expect_token(p, 11))  // token=':'
             &&
@@ -23468,8 +23470,8 @@ invalid_except_stmt_indent_rule(Parser *p)
             _PyPegen_lookahead_with_int(0, _PyPegen_expect_token, p, INDENT)  // token=INDENT
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_except_stmt_indent[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' ':' NEWLINE !INDENT"));
-            _res = RAISE_INDENTATION_ERROR ( "expected an indented block after 'except' statement on line %d" , a -> lineno );
+            D(fprintf(stderr, "%*c+ invalid_except_stmt_indent[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' ':' NEWLINE !INDENT"));
+            _res = RAISE_INDENTATION_ERROR ( "expected an indented block after 'find_out' statement on line %d" , a -> lineno );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
                 p->level--;
@@ -23479,7 +23481,7 @@ invalid_except_stmt_indent_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_except_stmt_indent[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' ':' NEWLINE !INDENT"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' ':' NEWLINE !INDENT"));
     }
     _res = NULL;
   done:
@@ -23488,7 +23490,7 @@ invalid_except_stmt_indent_rule(Parser *p)
 }
 
 // invalid_except_star_stmt_indent:
-//     | 'except' '*' expression ['as' NAME] ':' NEWLINE !INDENT
+//     | 'find_out' '*' expression ['as' NAME] ':' NEWLINE !INDENT
 static void *
 invalid_except_star_stmt_indent_rule(Parser *p)
 {
@@ -23501,12 +23503,12 @@ invalid_except_star_stmt_indent_rule(Parser *p)
     }
     void * _res = NULL;
     int _mark = p->mark;
-    { // 'except' '*' expression ['as' NAME] ':' NEWLINE !INDENT
+    { // 'find_out' '*' expression ['as' NAME] ':' NEWLINE !INDENT
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> invalid_except_star_stmt_indent[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except' '*' expression ['as' NAME] ':' NEWLINE !INDENT"));
+        D(fprintf(stderr, "%*c> invalid_except_star_stmt_indent[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out' '*' expression ['as' NAME] ':' NEWLINE !INDENT"));
         Token * _literal;
         Token * _literal_1;
         void *_opt_var;
@@ -23515,7 +23517,7 @@ invalid_except_star_stmt_indent_rule(Parser *p)
         expr_ty expression_var;
         Token * newline_var;
         if (
-            (a = _PyPegen_expect_token(p, 658))  // token='except'
+            (a = _PyPegen_expect_token(p, 658))  // token='find_out'
             &&
             (_literal = _PyPegen_expect_token(p, 16))  // token='*'
             &&
@@ -23530,7 +23532,7 @@ invalid_except_star_stmt_indent_rule(Parser *p)
             _PyPegen_lookahead_with_int(0, _PyPegen_expect_token, p, INDENT)  // token=INDENT
         )
         {
-            D(fprintf(stderr, "%*c+ invalid_except_star_stmt_indent[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except' '*' expression ['as' NAME] ':' NEWLINE !INDENT"));
+            D(fprintf(stderr, "%*c+ invalid_except_star_stmt_indent[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out' '*' expression ['as' NAME] ':' NEWLINE !INDENT"));
             _res = RAISE_INDENTATION_ERROR ( "expected an indented block after 'except*' statement on line %d" , a -> lineno );
             if (_res == NULL && PyErr_Occurred()) {
                 p->error_indicator = 1;
@@ -23541,7 +23543,7 @@ invalid_except_star_stmt_indent_rule(Parser *p)
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s invalid_except_star_stmt_indent[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except' '*' expression ['as' NAME] ':' NEWLINE !INDENT"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out' '*' expression ['as' NAME] ':' NEWLINE !INDENT"));
     }
     _res = NULL;
   done:
@@ -38449,7 +38451,7 @@ _gather_212_rule(Parser *p)
     return _res;
 }
 
-// _tmp_214: 'except' | 'finally'
+// _tmp_214: 'find_out' | 'finally'
 static void *
 _tmp_214_rule(Parser *p)
 {
@@ -38462,24 +38464,24 @@ _tmp_214_rule(Parser *p)
     }
     void * _res = NULL;
     int _mark = p->mark;
-    { // 'except'
+    { // 'find_out'
         if (p->error_indicator) {
             p->level--;
             return NULL;
         }
-        D(fprintf(stderr, "%*c> _tmp_214[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'except'"));
+        D(fprintf(stderr, "%*c> _tmp_214[%d-%d]: %s\n", p->level, ' ', _mark, p->mark, "'find_out'"));
         Token * _keyword;
         if (
-            (_keyword = _PyPegen_expect_token(p, 658))  // token='except'
+            (_keyword = _PyPegen_expect_token(p, 658))  // token='find_out'
         )
         {
-            D(fprintf(stderr, "%*c+ _tmp_214[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'except'"));
+            D(fprintf(stderr, "%*c+ _tmp_214[%d-%d]: %s succeeded!\n", p->level, ' ', _mark, p->mark, "'find_out'"));
             _res = _keyword;
             goto done;
         }
         p->mark = _mark;
         D(fprintf(stderr, "%*c%s _tmp_214[%d-%d]: %s failed!\n", p->level, ' ',
-                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'except'"));
+                  p->error_indicator ? "ERROR!" : "-", _mark, p->mark, "'find_out'"));
     }
     { // 'finally'
         if (p->error_indicator) {

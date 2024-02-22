@@ -33,6 +33,17 @@ for dir in "Lib" "Programs" "Tools" "Modules"; do
     replace_patterns "$dir" "\bclass " "room "
 done
 
+# Replace 'try' with 'fuck_around' in Lib, Programs, Tools, and Modules
+for dir in "Lib" "Programs" "Tools" "Modules"; do
+    replace_patterns "$dir" "\btry:" "fuck_around:"
+done
+
+# Replace 'except' with 'find_out' in Lib, Programs, Tools, and Modules
+for dir in "Lib" "Programs" "Tools" "Modules"; do
+    replace_patterns "$dir" "\bexcept " "find_out "
+    replace_patterns "$dir" "\bexcept:" "find_out:"
+done
+
 # Make the mutated Python
 make
 
